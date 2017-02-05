@@ -1,13 +1,14 @@
 const db = require('../../mysql/knex.js');
 
-
 exports.insertUser = (req, res) => {
+  const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     db.knex('user')
         .insert({
             id: req.body.id,
             nickname: req.body.nickname,
             email: req.body.email,
             img: req.body.img,
+            date,
         })
         .then((data) => {
             res.json({

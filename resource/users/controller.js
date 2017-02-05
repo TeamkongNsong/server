@@ -1,7 +1,7 @@
 const db = require('../../mysql/knex.js');
 
 exports.insertUser = (req, res) => {
-  const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const date = new Date().toLocaleString();
     db.knex('user')
         .insert({
             id: req.body.id,

@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-// const cors = require('cors'); // 냐중에 할거임
 const cors = require('cors');
 
 // user body-parser.
@@ -15,12 +14,16 @@ app.use(jsonParser);
 // use cors.
 app.use(cors());
 
-// use express Router.
-const userRouter = require ('./resource/users/userRouter');
-app.use('/', userRouter);
+// use express userRouter.
+const userRouter = require('./resource/users/userRouter');
+app.use('/users', userRouter);
+
+// use express flagRouter.
+const flagRouter = require('./resource/flags/flagRouter');
+app.use('/flags', flagRouter);
 
 app.get('/', (req, res) => {
-  res.send('Hi!');
+  res.send('실행중');
 });
 
 app.listen(3333, () => {

@@ -19,6 +19,7 @@ exports.returnFlags = (req, res) => {
  * POST
  */
 exports.insertFlag = (req, res) => {
+  console.log(req.body);
   const date = new Date();
   date.setHours(date.getHours() + 9);
   db.knex('user')

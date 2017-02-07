@@ -1,13 +1,13 @@
-const userController = require('./controller');
 const userRouter = require('express').Router();
+const userController = require('./userController');
 
-userRouter.route('/users')
+userRouter.route('/')
 .post(userController.insertUser);
 
-userRouter.route('/users/matchuser_id/:id')
+userRouter.route('/matchuser_id/:id')
 .get(userController.searchUserId);
 
-userRouter.route('/users/matchuser_nickname/:nickname')
+userRouter.route('/matchuser_nickname/:nickname')
 .get(userController.searchUserNickName);
 
 

@@ -1,5 +1,9 @@
 const db = require('../../mysql/knex.js');
 
+/*---------------users---------------*/
+/*
+ * POST
+ */
 exports.insertUser = (req, res) => {
   const date = new Date();
   date.setHours(date.getHours() + 9);
@@ -19,40 +23,52 @@ exports.insertUser = (req, res) => {
         });
 };
 
+
+
+/*---------------matchuser_id---------------*/
+/*
+ * GET
+ */
 exports.searchUserId = (req, res) => {
     if (req.body === undefined) {
         res.send('nothing come in');
     } else {
         db.knex('user')
-            .where({
-                id: req.params.id,
-            })
-            .select('id')
-            .then((data) => {
-                const check = data.length ? true : false;
-                res.send(check);
-            })
-            .catch((err) => {
-                throw err;
-            });
+        .where({
+            id: req.params.id,
+        })
+        .select('id')
+        .then((data) => {
+            const check = data.length ? true : false;
+            res.send(check);
+        })
+        .catch((err) => {
+            throw err;
+        });
     }
 };
 
+
+
+/*---------------matchuser_nickname---------------*/
+/*
+ * GET
+ */
 exports.searchUserNickName = (req, res) => {
     if (req.params === undefined) {
         res.send('입력된 유저가 없습니다.');
     } else {
         db.knex('user')
-            .where({
-                nickname: req.params.nickname,
-            })
-            .select('nickName')
-            .then((data) => {
-                const check = data.length ? true : false;
-                res.send(check);
-            })
-            .catch((err) => {
-                throw err;
-            });
+        .where({
+            nickname: req.params.nickname,
+        })
+        .select('nickName')
+        .then((data) => {
+            const check = data.length ? true : false;
+            res.send(check);
+        })
+        .catch((err) => {
+            throw err;
+        });
     }
 };

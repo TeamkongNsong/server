@@ -1,6 +1,6 @@
 const db = require('../../mysql/knex.js');
 
-/*---------------flag---------------*/
+/*---------------flags---------------*/
 /*
  * GET
  */
@@ -12,7 +12,7 @@ exports.returnAllFlags = (req, res) => {
     res.send(data);
   })
   .catch((err) => {
-    console.log("err on returnAllFlags's user_flag table." err);
+    console.log("err on returnAllFlags's user_flag table.", err);
   });
 }
 
@@ -35,8 +35,8 @@ exports.pinFlag = (req, res) => {
         nickname: req.body.nickname,
         title: req.body.title,
         message: req.body.message,
-        latitude: req.body.region.latitude,
-        longitude: req.body.region.longitude,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
         date,
     })
     .then((data) => {
@@ -46,11 +46,11 @@ exports.pinFlag = (req, res) => {
         res.end();
     })
     .catch((err) => {
-      console.log("err on pinFlag's user_flag table." err);
+      console.log("err on pinFlag's user_flag table.", err);
     });
   })
   .catch((err) => {
-    console.log("err on pinFlag's user table." err);
+    console.log("err on pinFlag's user table.", err);
   });
 };
 
@@ -59,7 +59,7 @@ exports.pinFlag = (req, res) => {
 /*
  * DELETE
  */
-exports deleteMapFlag = (req, res) => {
+exports.deleteMapFlag = (req, res) => {
   db.knex('user_flag')
   .where({
     nickname: req.params.nickname,
@@ -67,6 +67,6 @@ exports deleteMapFlag = (req, res) => {
   })
   .del()
   .catch((err) => {
-    console.log("err on deleteMapFlag's user_flag table." err);
+    console.log("err on deleteMapFlag's user_flag table.", err);
   });
 }

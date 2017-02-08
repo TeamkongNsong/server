@@ -26,10 +26,10 @@ userRouter.route('/profile/state_message')
 .put(userController.updateStateMessage);
 
 //TODO: 프로필 초기 이미지 어떻게 할 것인지에 대해 생각 해 볼 필요가 있음.
-userRoutere.route('/profile/img')
-.post(userController.retrieveUserimg)
-.put(userController.updateUserimg)
-.delete(userController.deleteUserimg)
+// userRouter.route('/profile/img')
+// .post(userController.retrieveUserimg)
+// .put(userController.updateUserimg)
+// .delete(userController.deleteUserimg)
 
 /*----------matchusers id & nickname-------------*/
 userRouter.route('/matchuser_id/:id')

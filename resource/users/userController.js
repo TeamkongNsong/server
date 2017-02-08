@@ -89,6 +89,9 @@ exports.insertUser = (req, res) => {
 
 
  /*---------------profile/nickname/---------------*/
+ /*
+ * PUT - 유저 프로필 닉네임 업데이트(본인)
+ */
 exports.updateNickname = (req, res) => {
   db.knex('user_flag')
   .where({
@@ -98,9 +101,10 @@ exports.updateNickname = (req, res) => {
     nickname: req.body.nickname,
   })
   .then(() => {
-    res.send({
-      "message": "타임라인 닉네임 바꾸는 중..";
+    res.json({
+      "message": "타임라인 닉네임 바꾸는 중.."
     });
+    res.end();
   })
   .catch((err) => {
     console.log("err on updateNickname's user_flag table", err);
@@ -114,9 +118,10 @@ exports.updateNickname = (req, res) => {
     nickname: req.body.nickname,
   })
   .then(() => {
-    res.send({
-      "message": "닉네임 변경 완료.";
-    });
+    res.json({
+      "message": "닉네임 변경 완료.",
+    })
+    res.end();
   })
   .catch((err) => {
     console.log("err on updateNickname's user table", err);
@@ -139,7 +144,7 @@ exports.updateStateMessage = (req, res) => {
     state_message: req.body.state_message,
   })
   .then(() => {
-    res.send({
+    res.json({
       "message": "상태메세지를 업데이트했습니다."
     })
     res.end();

@@ -1,10 +1,10 @@
 const db = require('../../mysql/knex.js');
 
-/*---------------flags---------------*/
+/*---------------flag---------------*/
 /*
  * GET
  */
-exports.returnFlags = (req, res) => {
+exports.returnAllFlags = (req, res) => {
   console.log('checking returnFlags', req.body);
   db.knex("user_flag")
   .select()
@@ -12,14 +12,14 @@ exports.returnFlags = (req, res) => {
     res.send(data);
   })
   .catch((err) => {
-    throw err;
+    console.log("err on returnAllFlags's user_flag table." err);
   });
 }
 
 /*
  * POST
  */
-exports.insertFlag = (req, res) => {
+exports.pinFlag = (req, res) => {
   console.log('checking insertFlag', req.body);
   const date = new Date();
   date.setHours(date.getHours() + 9);
@@ -33,6 +33,7 @@ exports.insertFlag = (req, res) => {
     .insert({
         user_idx: data[0].idx,
         nickname: req.body.nickname,
+        title: req.body.title,
         message: req.body.message,
         latitude: req.body.region.latitude,
         longitude: req.body.region.longitude,
@@ -45,10 +46,27 @@ exports.insertFlag = (req, res) => {
         res.end();
     })
     .catch((err) => {
-      throw err;
-    })
+      console.log("err on pinFlag's user_flag table." err);
+    });
   })
   .catch((err) => {
-    throw err;
-  })
+    console.log("err on pinFlag's user table." err);
+  });
 };
+
+
+/*---------------/:nickname/:idx---------------*/
+/*
+ * DELETE
+ */
+exports deleteMapFlag = (req, res) => {
+  db.knex('user_flag')
+  .where({
+    nickname: req.params.nickname,
+    idx: req.params.idx
+  })
+  .del()
+  .catch((err) => {
+    console.log("err on deleteMapFlag's user_flag table." err);
+  });
+}

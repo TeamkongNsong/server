@@ -8,10 +8,13 @@ const flagController = require('./flagController');
  * DELETE
  */
 
+// flag on map
 flagRouter.route('/')
-.get(flagController.returnFlags)
-.post(flagController.insertFlag);
+.get(flagController.returnAllFlags)
+.post(flagController.pinFlag);
 
+flagRouter.route('/:nickname/:idx')
+.delete(flagController.deleteMapFlag);
 
 
 module.exports = flagRouter;

@@ -35,8 +35,8 @@ exports.pinFlag = (req, res) => {
         nickname: req.body.nickname,
         title: req.body.title,
         message: req.body.message,
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
+        latitude: req.body.region.latitude,
+        longitude: req.body.region.longitude,
         date,
     })
     .then((data) => {

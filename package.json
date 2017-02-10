@@ -11,8 +11,10 @@
   "dependencies": {
     "body-parser": "^1.16.0",
     "bookshelf": "^0.10.3",
+    "choseong-search": "^2.0.0",
     "cors": "^2.8.1",
     "express": "^4.14.1",
+    "hangul-js": "^0.2.2",
     "knex": "^0.12.6",
     "mysql": "^2.13.0"
   },

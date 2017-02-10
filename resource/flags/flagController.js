@@ -54,8 +54,26 @@ exports.pinFlag = (req, res) => {
   });
 };
 
-
-/*---------------/:nickname/:idx---------------*/
+/*---------------flags/:nickname?idx=--------------*/
+/*
+ * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
+ */
+exports.isMatchNicknmae = (req, res) => {
+  db.knex('user_flag')
+  .where({
+    idx: req.query.idx,
+  })
+  .select()
+  .then((flag) => {
+    console.log(flag);
+    const check = (flag[0].nickname === req.params.nickname) ? true : false;
+    res.send(check);
+  })
+  .catch((err) => {
+    console.log("err of isMatchNicknmae on flagController's onClickUserNickname and onClickFlagIdx", err);
+  });
+}
+/*---------------flags/:nickname/:idx---------------*/
 /*
  * DELETE
  */
@@ -63,9 +81,14 @@ exports.deleteMapFlag = (req, res) => {
   db.knex('user_flag')
   .where({
     nickname: req.params.nickname,
-    idx: req.params.idx
+    idx: req.params.idx,
   })
   .del()
+  .then(() => {
+    res.json({
+      "message": "deleted message succesfully!"
+    })
+  })
   .catch((err) => {
     console.log("err on deleteMapFlag's user_flag table.", err);
   });

@@ -13,8 +13,11 @@ flagRouter.route('/')
 .get(flagController.returnAllFlags)
 .post(flagController.pinFlag);
 
-flagRouter.route('/:nickname/:idx')
-.delete(flagController.deleteMapFlag);
+flagRouter.route('/:nickname')
+.get(flagController.isMatchNicknmae);
+
+// flagRouter.route('/:nickname/:idx')
+// .delete(flagController.deleteMapFlag);
 
 
 module.exports = flagRouter;

@@ -4,6 +4,12 @@ const db = require('../../mysql/knex.js');
 /*
  * POST - 유저 등록(회원 가입)
  */
+
+
+
+/*
+ * POST - 유저 등록(회원 가입)
+ */
 exports.insertUser = (req, res) => {
   const date = new Date();
   date.setHours(date.getHours() + 9);
@@ -61,6 +67,7 @@ exports.insertUser = (req, res) => {
      console.log("err on deleteUser's user table", err);
    });
  }
+
 
 
 /*---------------users/:id---------------*/

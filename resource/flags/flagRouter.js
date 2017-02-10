@@ -16,8 +16,8 @@ flagRouter.route('/')
 flagRouter.route('/:nickname')
 .get(flagController.isMatchNicknmae);
 
-// flagRouter.route('/:nickname/:idx')
-// .delete(flagController.deleteMapFlag);
+flagRouter.route('/:idx')
+.delete(flagController.deleteMapFlag);
 
 
 module.exports = flagRouter;

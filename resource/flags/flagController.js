@@ -73,14 +73,15 @@ exports.isMatchNicknmae = (req, res) => {
     console.log("err of isMatchNicknmae on flagController's onClickUserNickname and onClickFlagIdx", err);
   });
 }
-/*---------------flags/:nickname/:idx---------------*/
+
+
+/*---------------flags/:idx---------------*/
 /*
  * DELETE
  */
 exports.deleteMapFlag = (req, res) => {
   db.knex('user_flag')
   .where({
-    nickname: req.params.nickname,
     idx: req.params.idx,
   })
   .del()

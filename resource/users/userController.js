@@ -95,6 +95,7 @@ exports.retrieveUser = (req, res) => {
  * GET - 유저 초성 검색(main 화면)
  */
 exports.searchUser = (req, res) => {
+  console.log(req.params);
     db.knex('user')
     .select()
     .then((users) => {
@@ -109,15 +110,8 @@ exports.searchUser = (req, res) => {
           });
         }
       });
-      if (result.length === 0) {
-        res.json({
-          "message": "검색된 유저가 없습니다."
-        });
-        res.end();
-      } else {
-        res.send(result);
-      }
-    })
+      res.send(result);
+    });
   }
 
  /*---------------profile/nickname/---------------*/

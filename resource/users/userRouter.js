@@ -17,6 +17,10 @@ userRouter.route('/:id')
 .get(userController.retrieveUser)
 .delete(userController.deleteUser);
 
+userRouter.route('/search/:word')
+.get(userController.searchUser);
+
+
 // users profile
 //TODO: 닉네임 업데이트, -> 1주일에 한 번 가능하도록.
 userRouter.route('/profile/nickname')

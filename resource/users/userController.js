@@ -1,18 +1,13 @@
 const db = require('../../mysql/knex.js');
+const Hangul = require('hangul-js');
 
 /*---------------users---------------*/
 /*
  * POST - 유저 등록(회원 가입)
  */
-
-
-
-/*
- * POST - 유저 등록(회원 가입)
- */
 exports.insertUser = (req, res) => {
-  const date = new Date();
-  date.setHours(date.getHours() + 9);
+    const date = new Date();
+    date.setHours(date.getHours() + 9);
     db.knex('user')
     .insert({
         id: req.body.id,
@@ -74,7 +69,7 @@ exports.insertUser = (req, res) => {
 /*
  * GET - 유저 검색
  */
- exports.retrieveUser = (req, res) => {
+exports.retrieveUser = (req, res) => {
    console.log('checking retrieveUser: ', req.params);
    if (req.params === undefined) {
      res.send('nothing come in');
@@ -92,8 +87,38 @@ exports.insertUser = (req, res) => {
        console.log("err on retrieveUser's user table", err);
      });
    }
- }
+}
 
+
+/*---------------users/search/:word---------------*/
+/*
+ * GET - 유저 초성 검색(main 화면)
+ */
+exports.searchUser = (req, res) => {
+    db.knex('user')
+    .select()
+    .then((users) => {
+      const searcher = new Hangul.Searcher(`${req.params.word}`);
+      const result = [];
+      users.forEach((user) => {
+        if (searcher.search(user.nickname) !== -1) {
+          result.push({
+            img: user.img,
+            nickname: user.nickname,
+            state_message: user.state_message,
+          });
+        }
+      });
+      if (result.length === 0) {
+        res.json({
+          "message": "검색된 유저가 없습니다."
+        });
+        res.end();
+      } else {
+        res.send(result);
+      }
+    })
+  }
 
  /*---------------profile/nickname/---------------*/
  /*

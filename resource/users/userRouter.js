@@ -17,9 +17,6 @@ userRouter.route('/:id')
 .get(userController.retrieveUser)
 .delete(userController.deleteUser);
 
-// users/:nickname/:id
-.get(userController.isMatchUserSelf);
-
 
 //users/search/
 userRouter.route('/search/:word')

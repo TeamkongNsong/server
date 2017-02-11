@@ -64,7 +64,25 @@ exports.insertUser = (req, res) => {
  }
 
 
-
+ /*---------------users/:nickname?id=..--------------*/
+ /*
+  * GET: 프로필 들어갈 때 자기 프로필인지 아닌지 true, false로 응답
+  */
+ exports.isMatchUserSelf = (req, res) => {
+   db.knex('user')
+   .where({
+     id: req.query.id,
+   })
+   .select()
+   .then((user) => {
+     console.log(user);
+     const check = (user[0].nickname === req.params.nickname) ? true : false;
+     res.send(check);
+   })
+   .catch((err) => {
+     console.log("err of isMatchUserSelf on userController's onClickUserNickname and onClickId", err);
+   });
+ }
 /*---------------users/:id---------------*/
 /*
  * GET - 유저 검색

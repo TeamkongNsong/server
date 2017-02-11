@@ -14,7 +14,7 @@ flagRouter.route('/')
 .post(flagController.pinFlag);
 
 flagRouter.route('/:nickname')
-.get(flagController.isMatchNicknmae);
+.get(flagController.isMatchUserSelf);
 
 flagRouter.route('/:idx')
 .delete(flagController.deleteMapFlag);

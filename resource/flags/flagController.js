@@ -58,7 +58,7 @@ exports.pinFlag = (req, res) => {
 /*
  * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
  */
-exports.isMatchNicknmae = (req, res) => {
+exports.isMatchUserSelf = (req, res) => {
   db.knex('user_flag')
   .where({
     idx: req.query.idx,
@@ -70,7 +70,7 @@ exports.isMatchNicknmae = (req, res) => {
     res.send(check);
   })
   .catch((err) => {
-    console.log("err of isMatchNicknmae on flagController's onClickUserNickname and onClickFlagIdx", err);
+    console.log("err of isMatchUserSelf on flagController's onClickUserNickname and onClickFlagIdx", err);
   });
 }
 

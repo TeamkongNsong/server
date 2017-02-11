@@ -67,7 +67,6 @@ exports.insertUser = (req, res) => {
  /*---------------users/:nickname?id=..--------------*/
  /*
   * GET: 프로필 들어갈 때 자기 프로필인지 아닌지 true, false로 응답
-  */
  exports.isMatchUserSelf = (req, res) => {
    db.knex('user')
    .where({
@@ -83,6 +82,8 @@ exports.insertUser = (req, res) => {
      console.log("err of isMatchUserSelf on userController's onClickUserNickname and onClickId", err);
    });
  }
+ */
+
 /*---------------users/:id---------------*/
 /*
  * GET - 유저 검색
@@ -110,7 +111,7 @@ exports.retrieveUser = (req, res) => {
 
 /*---------------users/search/:word---------------*/
 /*
- * GET - 유저 초성 검색(main 화면)
+ * GET - 유저 초성 검색(main 화면) - 2.11
  */
 exports.searchUser = (req, res) => {
   console.log(req.params);
@@ -137,26 +138,9 @@ exports.searchUser = (req, res) => {
  * PUT - 유저 프로필 닉네임 업데이트(본인)
  */
 exports.updateNickname = (req, res) => {
-  db.knex('user_flag')
-  .where({
-    nickname: req.body.nickname,
-  })
-  .update({
-    nickname: req.body.nickname,
-  })
-  .then(() => {
-    res.json({
-      "message": "타임라인 닉네임 바꾸는 중.."
-    });
-    res.end();
-  })
-  .catch((err) => {
-    console.log("err on updateNickname's user_flag table", err);
-  });
-
   db.knex('user')
   .where({
-    nickname: req.body.nickname,
+    idx: req.body.idx,
   })
   .update({
     nickname: req.body.nickname,

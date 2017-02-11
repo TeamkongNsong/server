@@ -29,6 +29,28 @@ exports.insertUser = (req, res) => {
 };
 
 /*
+* PUT - 유저 프로필 업데이트(본인)
+*/
+exports.updateUser = (req, res) => {
+ db.knex('user')
+ .where({
+   id: req.body.id,
+ })
+ .update({
+   nickname: req.body.nickname,
+ })
+ .then(() => {
+   res.json({
+     "message": "닉네임 변경 완료.",
+   })
+   res.end();
+ })
+ .catch((err) => {
+   console.log("err on updateNickname's user table", err);
+ })
+}
+
+/*
  * DELETE - 유저 삭제(회원 탈퇴)
  */
  exports.deleteUser = (req, res) => {
@@ -132,30 +154,6 @@ exports.searchUser = (req, res) => {
       res.send(result);
     });
   }
-
- /*---------------profile/nickname/---------------*/
- /*
- * PUT - 유저 프로필 닉네임 업데이트(본인)
- */
-exports.updateNickname = (req, res) => {
-  db.knex('user')
-  .where({
-    idx: req.body.idx,
-  })
-  .update({
-    nickname: req.body.nickname,
-  })
-  .then(() => {
-    res.json({
-      "message": "닉네임 변경 완료.",
-    })
-    res.end();
-  })
-  .catch((err) => {
-    console.log("err on updateNickname's user table", err);
-  })
-}
-
 
 
 /*---------------profile/state_message/---------------*/

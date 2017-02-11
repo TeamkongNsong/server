@@ -10,7 +10,8 @@ const userController = require('./userController');
 
 // users
 userRouter.route('/')
-.post(userController.insertUser);
+.post(userController.insertUser)
+.put(userController.updateUser);
 
 // users/:id
 userRouter.route('/:id')
@@ -25,11 +26,11 @@ userRouter.route('/search/:word')
 
 // users profile
 //TODO: 닉네임 업데이트, -> 1주일에 한 번 가능하도록.
-userRouter.route('/profile/nickname')
-.put(userController.updateNickname);
-
-userRouter.route('/profile/state_message')
-.put(userController.updateStateMessage);
+// userRouter.route('/profile/nickname')
+// .put(userController.updateNickname);
+//
+// userRouter.route('/profile/state_message')
+// .put(userController.updateStateMessage);
 
 //TODO: 프로필 초기 이미지 어떻게 할 것인지에 대해 생각 해 볼 필요가 있음.
 // userRouter.route('/profile/img')

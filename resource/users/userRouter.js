@@ -1,3 +1,5 @@
+console.log('userRouter.js');
+
 const userRouter = require('express').Router();
 const userController = require('./userController');
 

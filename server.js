@@ -1,3 +1,5 @@
+console.log('server.js');
+
 const express = require('express');
 const expressValidator = require('express-validator');
 const bodyParser = require('body-parser');
@@ -57,7 +59,6 @@ app.use('/flags', flagRouter);
 app.get('/', (req, res) => {
   res.send('wikius server 실행');
 });
-
 app.listen(app.get('port'), () => {
   console.log(`Example app listening on port, ${app.get('port')}!`)
 });

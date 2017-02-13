@@ -1,3 +1,5 @@
+console.log('authController.js');
+
 const db = require('../../model/knex.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');

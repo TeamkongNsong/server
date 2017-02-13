@@ -155,7 +155,7 @@ exports.updateStateMessage = (req, res) => {
 }
 
 
-/*---------------matchuser_user_id---------------*/
+/*---------------matchuser/:user_id---------------*/
 /*
  * GET - 유저 user_id 중복 확인
  */
@@ -180,7 +180,7 @@ exports.checkDuplicatedUserId = (req, res) => {
 
 
 
-/*---------------matchuser_nickname---------------*/
+/*---------------matchuser/:nickname---------------*/
 /*
  * GET - 유저 닉네임 중복 확인
  */

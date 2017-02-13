@@ -38,7 +38,7 @@ userRouter.route('/search/:word')
 // .delete(userController.deleteUserimg)
 
 /*----------matchusers id & nickname-------------*/
-userRouter.route('/matchuser_id/:id')
+userRouter.route('/matchuser_id/:user_id')
 .get(userController.checkDuplicatedUserId);
 
 userRouter.route('/matchuser_nickname/:nickname')

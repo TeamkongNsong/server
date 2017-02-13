@@ -83,7 +83,6 @@ exports.createWikiUser = (req, res) => {
 /*
  * POST 위키 유저 로그인시 토큰 발행
  */
-
 exports.loginWiki = (req, res) => {
   const { user_id, password } = req.body;
   const secret = req.app.get('jwt-secret');
@@ -146,5 +145,30 @@ exports.loginWiki = (req, res) => {
     res.status(404).json({
       message: err
     })
+  });
+}
+
+/*--------------users/auth/login/--------------*/
+/*
+ * DELETE 위키 유저 로그인시 토큰 발행
+ */
+exports.logoutWiki = (req, res) => {
+  const { id_token } = req.body;
+  User.where({
+    id_token,
+  })
+  .select('id_token')
+  .del()
+  .then(() => {
+    res.json({
+      msg: 'logged out successfully!',
+      statusCode: 202,
+    });
+  })
+  .catch((err) => {
+    res.json({
+      msg: err,
+      statusCode: 404,
+    });
   });
 }

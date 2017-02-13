@@ -12,7 +12,6 @@ const config = require('./config');
 const app = express();
 
 //set port, jwt-secret
-app.set('port', (process.env.PORT || 3307));
 app.set('jwt-secret', config.secret);
 
 
@@ -59,6 +58,6 @@ app.use('/flags', flagRouter);
 app.get('/', (req, res) => {
   res.send('wikius server 실행');
 });
-app.listen(app.get('port'), () => {
-  console.log(`Example app listening on port, ${app.get('port')}!`)
+app.listen(3333, () => {
+  console.log(`Example app listening on port, 3333!`)
 });

@@ -15,6 +15,6 @@ authRouter.route('/wiki/login')
 .post(authContorller.loginWiki);
 
 authRouter.route('wiki/logout')
-.del(authRouter.logoutWiki);
+.delete(authContorller.logoutWiki);
 
 module.exports = authRouter;

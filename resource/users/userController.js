@@ -1,12 +1,13 @@
 const db = require('../../model/knex.js');
 const Hangul = require('hangul-js');
+const User = db('user');
+const Flag = db('user_flag');
 
 /*
 * PUT - 유저 프로필 업데이트(본인)
 */
 exports.updateUser = (req, res) => {
- db.knex('user')
- .where({
+ User.where({
    user_id: req.body.user_id,
  })
  .update({
@@ -28,8 +29,7 @@ exports.updateUser = (req, res) => {
  * DELETE - 유저 삭제(회원 탈퇴)
  */
  exports.deleteUser = (req, res) => {
-   db.knex('user_flag')
-   .where({
+   Flag.where({
      user_id: req.params.user_id,
    })
    .del()
@@ -85,23 +85,17 @@ exports.updateUser = (req, res) => {
  * GET - 유저 검색
  */
 exports.retrieveUser = (req, res) => {
-   console.log('checking retrieveUser: ', req.params);
-   if (req.params === undefined) {
-     res.send('nothing come in');
-   } else {
-     db.knex('user')
-     .where({
-       user_id: req.params.user_id,
-     })
-     .select()
-     .then((data) => {
-       console.log(data);
-       res.send(data[0]);
-     })
-     .catch((err) => {
-       console.log("err on retrieveUser's user table", err);
-     });
-   }
+   User.where({
+     user_id: req.params.user_id,
+   })
+   .select()
+   .then((data) => {
+     console.log(data);
+     res.send(data[0]);
+   })
+   .catch((err) => {
+     console.log("err on retrieveUser's user table", err);
+   });
 }
 
 
@@ -110,23 +104,21 @@ exports.retrieveUser = (req, res) => {
  * GET - 유저 초성 검색(main 화면) - 2.11
  */
 exports.searchUser = (req, res) => {
-  console.log(req.params);
-    db.knex('user')
-    .select()
-    .then((users) => {
-      const searcher = new Hangul.Searcher(`${req.params.word}`);
-      const result = [];
-      users.forEach((user) => {
-        if (searcher.search(user.nickname) !== -1) {
-          result.push({
-            img: user.img,
-            nickname: user.nickname,
-            state_message: user.state_message,
-          });
-        }
-      });
-      res.send(result);
+  User.select()
+  .then((users) => {
+    const searcher = new Hangul.Searcher(`${req.params.word}`);
+    const result = [];
+    users.forEach((user) => {
+      if (searcher.search(user.nickname) !== -1) {
+        result.push({
+          img: user.img,
+          nickname: user.nickname,
+          state_message: user.state_message,
+        });
+      }
     });
+    res.send(result);
+  });
   }
 
 
@@ -135,8 +127,7 @@ exports.searchUser = (req, res) => {
 * PUT - 유저 프로필 상태메세지 업데이트(본인)
 */
 exports.updateStateMessage = (req, res) => {
-  db.knex('user')
-  .where({
+  User.where({
     user_id: req.body.user_id,
   })
   .select('state_message')
@@ -160,22 +151,17 @@ exports.updateStateMessage = (req, res) => {
  * GET - 유저 user_id 중복 확인
  */
 exports.checkDuplicatedUserId = (req, res) => {
-    if (req.body === undefined) {
-        res.send('nothing come in');
-    } else {
-        db.knex('user')
-        .where({
-            user_id: req.params.user_id,
-        })
-        .select('user_id')
-        .then((data) => {
-            const check = data.length ? true : false;
-            res.send(check);
-        })
-        .catch((err) => {
-          console.log("err on checkUserId's user", err);
-        });
-    }
+  User.where({
+      user_id: req.params.user_id,
+  })
+  .select('user_id')
+  .then((data) => {
+    const check = data.length ? true : false;
+    res.send(check);
+  })
+  .catch((err) => {
+    console.log("err on checkUserId's user", err);
+  });
 };
 
 
@@ -185,20 +171,15 @@ exports.checkDuplicatedUserId = (req, res) => {
  * GET - 유저 닉네임 중복 확인
  */
 exports.checkDuplicatedUserNickname = (req, res) => {
-    if (req.params === undefined) {
-        res.send('입력된 유저가 없습니다.');
-    } else {
-        db.knex('user')
-        .where({
-            nickname: req.params.nickname,
-        })
-        .select('nickName')
-        .then((data) => {
-            const check = data.length ? true : false;
-            res.send(check);
-        })
-        .catch((err) => {
-          console.log("err on checkUserNickName", err);
-        });
-    }
+  User.where({
+      nickname: req.params.nickname,
+  })
+  .select('nickName')
+  .then((data) => {
+      const check = data.length ? true : false;
+      res.send(check);
+  })
+  .catch((err) => {
+    console.log("err on checkUserNickName", err);
+  });
 };

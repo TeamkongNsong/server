@@ -2,8 +2,8 @@ const config = require('../config.js');
 const knex = require('knex')({
   client: 'mysql',
   connection: {
-    host: config.host,
-    port: config.port,
+    host: 'wikius.cm5qkmkpq74f.ap-northeast-2.rds.amazonaws.com',
+    port: 3306,
     user: config.user,
     password: config.password,
     database: config.database

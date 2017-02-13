@@ -1,32 +1,5 @@
-const db = require('../../mysql/knex.js');
+const db = require('../../model/knex.js');
 const Hangul = require('hangul-js');
-
-/*---------------users---------------*/
-/*
- * POST - 유저 등록(회원 가입)
- */
-exports.insertUser = (req, res) => {
-    const date = new Date();
-    date.setHours(date.getHours() + 9);
-    db.knex('user')
-    .insert({
-        id: req.body.id,
-        nickname: req.body.nickname,
-        state_message: "",
-        email: req.body.email,
-        img: req.body.img,
-        date,
-    })
-    .then((data) => {
-        res.json({
-            "message": "환영합니다."
-        });
-        res.end();
-    })
-    .catch((err) => {
-      console.log("err on insertUser's user table", err);
-    });
-};
 
 /*
 * PUT - 유저 프로필 업데이트(본인)
@@ -34,14 +7,15 @@ exports.insertUser = (req, res) => {
 exports.updateUser = (req, res) => {
  db.knex('user')
  .where({
-   id: req.body.id,
+   user_id: req.body.user_id,
  })
  .update({
    nickname: req.body.nickname,
+   device_info: req.body.device_info,
  })
  .then(() => {
    res.json({
-     "message": "닉네임 변경 완료.",
+     message: "닉네임 변경 완료.",
    })
    res.end();
  })
@@ -56,7 +30,7 @@ exports.updateUser = (req, res) => {
  exports.deleteUser = (req, res) => {
    db.knex('user_flag')
    .where({
-     id: req.params.id,
+     user_id: req.params.user_id,
    })
    .del()
    .then(() => {
@@ -71,7 +45,7 @@ exports.updateUser = (req, res) => {
 
    db.knex('user')
    .where({
-     id: req.params.id,
+     user_id: req.params.user_id,
    })
    .del()
    .then(() => {
@@ -86,13 +60,13 @@ exports.updateUser = (req, res) => {
  }
 
 
- /*---------------users/:nickname?id=..--------------*/
+ /*---------------users/:nickname?user_id=..--------------*/
  /*
   * GET: 프로필 들어갈 때 자기 프로필인지 아닌지 true, false로 응답
  exports.isMatchUserSelf = (req, res) => {
    db.knex('user')
    .where({
-     id: req.query.id,
+     user_id: req.query.user_id,
    })
    .select()
    .then((user) => {
@@ -106,7 +80,7 @@ exports.updateUser = (req, res) => {
  }
  */
 
-/*---------------users/:id---------------*/
+/*---------------users/:user_id---------------*/
 /*
  * GET - 유저 검색
  */
@@ -117,7 +91,7 @@ exports.retrieveUser = (req, res) => {
    } else {
      db.knex('user')
      .where({
-       id: req.params.id,
+       user_id: req.params.user_id,
      })
      .select()
      .then((data) => {
@@ -163,7 +137,7 @@ exports.searchUser = (req, res) => {
 exports.updateStateMessage = (req, res) => {
   db.knex('user')
   .where({
-    id: req.body.id,
+    user_id: req.body.user_id,
   })
   .select('state_message')
   .update({
@@ -181,19 +155,19 @@ exports.updateStateMessage = (req, res) => {
 }
 
 
-/*---------------matchuser_id---------------*/
+/*---------------matchuser_user_id---------------*/
 /*
- * GET - 유저 id 중복 확인
+ * GET - 유저 user_id 중복 확인
  */
-exports.checkUserId = (req, res) => {
+exports.checkDuplicatedUserId = (req, res) => {
     if (req.body === undefined) {
         res.send('nothing come in');
     } else {
         db.knex('user')
         .where({
-            id: req.params.id,
+            user_id: req.params.user_id,
         })
-        .select('id')
+        .select('user_id')
         .then((data) => {
             const check = data.length ? true : false;
             res.send(check);
@@ -210,7 +184,7 @@ exports.checkUserId = (req, res) => {
 /*
  * GET - 유저 닉네임 중복 확인
  */
-exports.checkUserNickName = (req, res) => {
+exports.checkDuplicatedUserNickname = (req, res) => {
     if (req.params === undefined) {
         res.send('입력된 유저가 없습니다.');
     } else {

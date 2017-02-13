@@ -1,7 +1,14 @@
 const express = require('express');
-const app = express();
+const expressValidator = require('express-validator');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+
+// init app
+const app = express();
+
+// load the config
+const config = require('./config');
 
 // user body-parser.
 const urlencodedParser = bodyParser.urlencoded({
@@ -11,21 +18,52 @@ const jsonParser = bodyParser.json();
 
 app.use(urlencodedParser);
 app.use(jsonParser);
+
+//init validator
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value) {
+      var namespace = param.split('.')
+      , root    = namespace.shift()
+      , formParam = root;
+
+    while(namespace.length) {
+      formParam += '[' + namespace.shift() + ']';
+    }
+    return {
+      param : formParam,
+      msg   : msg,
+      value : value
+    };
+  }
+}));
+
 // use cors.
 app.use(cors());
 
-// use express userRouter.
+//set port, jwt-secret
+app.set('port', (process.env.PORT || 3307));
+app.set('jwt-secret', config.secret);
+
+/*--------------------USE ROUTER--------------------*/
+const authRouter = require('./resource/auth/authRouter');
+app.use('/auth', authRouter);
+
 const userRouter = require('./resource/users/userRouter');
 app.use('/users', userRouter);
 
-// use express flagRouter.
 const flagRouter = require('./resource/flags/flagRouter');
 app.use('/flags', flagRouter);
 
+
+//set port, jwt-secret
+app.set('port', (process.env.PORT || 3307));
+app.set('jwt-secret', config.secret);
+
+
 app.get('/', (req, res) => {
-  res.send('실행중');
+  res.send('wikius server 실행');
 });
 
-app.listen(3333, () => {
-  console.log('Example app listening on port 3333!');
+app.listen(app.get('port'), () => {
+  console.log(`Example app listening on port, ${app.get('port')}!`)
 });

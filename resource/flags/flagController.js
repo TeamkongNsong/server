@@ -1,4 +1,4 @@
-const db = require('../../mysql/knex.js');
+const db = require('../../model/knex.js');
 
 /*---------------flags---------------*/
 /*

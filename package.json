@@ -16,7 +16,10 @@
     "express": "^4.14.1",
     "hangul-js": "^0.2.2",
     "knex": "^0.12.6",
-    "mysql": "^2.13.0"
+    "mysql": "^2.13.0",
+    "express-validator": "^3.1.2",
+    "jsonwebtoken": "^7.2.1",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",

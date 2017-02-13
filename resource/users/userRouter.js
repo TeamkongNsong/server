@@ -10,11 +10,10 @@ const userController = require('./userController');
 
 // users
 userRouter.route('/')
-.post(userController.insertUser)
 .put(userController.updateUser);
 
 // users/:id
-userRouter.route('/:id')
+userRouter.route('/:user_id')
 .get(userController.retrieveUser)
 .delete(userController.deleteUser);
 
@@ -40,10 +39,10 @@ userRouter.route('/search/:word')
 
 /*----------matchusers id & nickname-------------*/
 userRouter.route('/matchuser_id/:id')
-.get(userController.checkUserId);
+.get(userController.checkDuplicatedUserId);
 
 userRouter.route('/matchuser_nickname/:nickname')
-.get(userController.checkUserNickName);
+.get(userController.checkDuplicatedUserNickname);
 /*------------------------------------------------*/
 
 module.exports = userRouter;

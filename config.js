@@ -1,3 +1,5 @@
+console.log('config.js');
+
 module.exports = {
     'secret': 'OhSoRyAnDShIrImP',
     'client': 'mysql',

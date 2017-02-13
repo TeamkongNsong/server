@@ -1,3 +1,5 @@
+console.log('userController.js');
+
 const db = require('../../model/knex.js');
 const Hangul = require('hangul-js');
 const User = db('user');

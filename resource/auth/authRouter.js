@@ -1,3 +1,5 @@
+console.log('authRouter.js');
+
 const authRouter = require('express').Router();
 const authContorller = require('./authController');
 

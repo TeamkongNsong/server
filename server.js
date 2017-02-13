@@ -55,11 +55,6 @@ const flagRouter = require('./resource/flags/flagRouter');
 app.use('/flags', flagRouter);
 
 
-//set port, jwt-secret
-app.set('port', (process.env.PORT || 3307));
-app.set('jwt-secret', config.secret);
-
-
 app.get('/', (req, res) => {
   res.send('wikius server 실행');
 });

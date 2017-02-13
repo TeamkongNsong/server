@@ -3,12 +3,16 @@ const expressValidator = require('express-validator');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+// load the config
+const config = require('./config');
 
 // init app
 const app = express();
 
-// load the config
-const config = require('./config');
+//set port, jwt-secret
+app.set('port', (process.env.PORT || 3307));
+app.set('jwt-secret', config.secret);
+
 
 // user body-parser.
 const urlencodedParser = bodyParser.urlencoded({
@@ -40,10 +44,6 @@ app.use(expressValidator({
 // use cors.
 app.use(cors());
 
-//set port, jwt-secret
-app.set('port', (process.env.PORT || 3307));
-app.set('jwt-secret', config.secret);
-
 /*--------------------USE ROUTER--------------------*/
 const authRouter = require('./resource/auth/authRouter');
 app.use('/auth', authRouter);
@@ -53,7 +53,6 @@ app.use('/users', userRouter);
 
 const flagRouter = require('./resource/flags/flagRouter');
 app.use('/flags', flagRouter);
-
 
 app.get('/', (req, res) => {
   res.send('wikius server 실행');

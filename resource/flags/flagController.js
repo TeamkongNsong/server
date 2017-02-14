@@ -1,4 +1,4 @@
-const db = require('../../model/knex.js');
+const knex = require('../../model/knex.js');
 
 /*---------------flags---------------*/
 /*
@@ -6,7 +6,7 @@ const db = require('../../model/knex.js');
  */
 exports.returnAllFlags = (req, res) => {
   console.log('checking returnFlags', req.body);
-  db.knex("user_flag")
+  knex("user_flag")
   .select()
   .then((data) => {
     res.send(data);
@@ -14,7 +14,7 @@ exports.returnAllFlags = (req, res) => {
   .catch((err) => {
     console.log("err on returnAllFlags's user_flag table.", err);
   });
-}
+};
 
 /*
  * POST
@@ -23,13 +23,13 @@ exports.pinFlag = (req, res) => {
   console.log('checking insertFlag', req.body);
   const date = new Date();
   date.setHours(date.getHours() + 9);
-  db.knex('user')
+  knex('user')
   .where({
     nickname: req.body.nickname,
   })
   .select('idx')
   .then((data) => {
-    db.knex('user_flag')
+    knex('user_flag')
     .insert({
         user_idx: data[0].idx,
         nickname: req.body.nickname,
@@ -59,7 +59,7 @@ exports.pinFlag = (req, res) => {
  * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
  */
 exports.isMatchUserSelf = (req, res) => {
-  db.knex('user_flag')
+  knex('user_flag')
   .where({
     idx: req.query.idx,
   })
@@ -72,7 +72,7 @@ exports.isMatchUserSelf = (req, res) => {
   .catch((err) => {
     console.log("err of isMatchUserSelf on flagController's onClickUserNickname and onClickFlagIdx", err);
   });
-}
+};
 
 
 /*---------------flags/:idx---------------*/
@@ -80,7 +80,7 @@ exports.isMatchUserSelf = (req, res) => {
  * DELETE
  */
 exports.deleteMapFlag = (req, res) => {
-  db.knex('user_flag')
+  knex('user_flag')
   .where({
     idx: req.params.idx,
   })
@@ -88,9 +88,9 @@ exports.deleteMapFlag = (req, res) => {
   .then(() => {
     res.json({
       "message": "deleted message succesfully!"
-    })
+    });
   })
   .catch((err) => {
     console.log("err on deleteMapFlag's user_flag table.", err);
   });
-}
+};

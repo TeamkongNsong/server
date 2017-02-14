@@ -1,65 +1,82 @@
-console.log('userController.js');
-
-const db = require('../../model/knex.js');
+const knex = require('../../model/knex.js');
 const Hangul = require('hangul-js');
-const User = db('user');
-const Flag = db('user_flag');
+const config = require('../../config.js');
 
+/*---------------/change/nickname---------------*/
 /*
-* PUT - 유저 프로필 업데이트(본인)
+* PUT - 유저 닉네임 업데이트
 */
-exports.updateUser = (req, res) => {
- User.where({
-   user_id: req.body.user_id,
- })
- .update({
-   nickname: req.body.nickname,
-   device_info: req.body.device_info,
- })
- .then(() => {
-   res.json({
-     message: "닉네임 변경 완료.",
-   })
-   res.end();
- })
- .catch((err) => {
-   console.log("err on updateNickname's user table", err);
- })
-}
+exports.changeUserNickname = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+    const { nickname } = req.body;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('nickname', 'nickname is required').notEmpty();
+
+    knex('user')
+    .where({
+        id_token,
+    })
+    .select()
+    .then((data) => {
+        console.log(data);
+    })
+    .update({
+        nickname,
+        changed_at: config.date,
+    })
+    .then((resa) => {
+        res.json({
+            msg: 'nickname updated!'
+        });
+    })
+    .catch((err) => {
+        res.json({
+            msg: `err on nicname updating :: ${err}`
+        });
+    });
+};
+
+
+
+/*---------------users/:id---------------*/
 
 /*
  * DELETE - 유저 삭제(회원 탈퇴)
  */
- exports.deleteUser = (req, res) => {
-   Flag.where({
-     user_id: req.params.user_id,
-   })
-   .del()
-   .then(() => {
-     res.json({
-       "message": "유저 데이터 삭제 중."
-     });
-     res.end();
-   })
-   .catch((err) => {
-     console.log("err on deleteUser's user_flag table", err);
-   });
+exports.deleteUser = (req, res) => {
+    knex('user_flag')
+    .where({
+        user_id: req.params.user_id,
+    })
+    .del()
+    .then(() => {
+        res.json({
+            "message": "유저 데이터 삭제 중."
+        });
+    })
+    .catch((err) => {
+        console.log("err on deleteUser's user_flag table", err);
+    });
 
-   db.knex('user')
-   .where({
-     user_id: req.params.user_id,
-   })
-   .del()
-   .then(() => {
-     res.json({
-       "message": "유저 데이터 삭제 완료."
-     });
-     res.end();
-   })
-   .catch((err) => {
-     console.log("err on deleteUser's user table", err);
-   });
- }
+    db.knex('user')
+        .where({
+            user_id: req.params.user_id,
+        })
+        .del()
+        .then(() => {
+            res.json({
+                "message": "유저 데이터 삭제 완료."
+            });
+        })
+        .catch((err) => {
+            console.log("err on deleteUser's user table", err);
+    });
+};
 
 
  /*---------------users/:nickname?user_id=..--------------*/
@@ -87,7 +104,8 @@ exports.updateUser = (req, res) => {
  * GET - 유저 검색
  */
 exports.retrieveUser = (req, res) => {
-   User.where({
+    knex('user')
+    .where({
      user_id: req.params.user_id,
    })
    .select()
@@ -98,7 +116,7 @@ exports.retrieveUser = (req, res) => {
    .catch((err) => {
      console.log("err on retrieveUser's user table", err);
    });
-}
+};
 
 
 /*---------------users/search/:word---------------*/
@@ -106,7 +124,8 @@ exports.retrieveUser = (req, res) => {
  * GET - 유저 초성 검색(main 화면) - 2.11
  */
 exports.searchUser = (req, res) => {
-  User.select()
+  knex('user')
+  .select()
   .then((users) => {
     const searcher = new Hangul.Searcher(`${req.params.word}`);
     const result = [];
@@ -121,7 +140,7 @@ exports.searchUser = (req, res) => {
     });
     res.send(result);
   });
-  }
+ };
 
 
 /*---------------profile/state_message/---------------*/
@@ -129,7 +148,8 @@ exports.searchUser = (req, res) => {
 * PUT - 유저 프로필 상태메세지 업데이트(본인)
 */
 exports.updateStateMessage = (req, res) => {
-  User.where({
+    knex('user')
+    .where({
     user_id: req.body.user_id,
   })
   .select('state_message')
@@ -138,14 +158,14 @@ exports.updateStateMessage = (req, res) => {
   })
   .then(() => {
     res.json({
-      "message": "상태메세지를 업데이트했습니다."
-    })
+      msg: "상태메세지를 업데이트했습니다."
+  });
     res.end();
   })
   .catch((err) => {
     console.log("err on updateStateMessage's user table", err);
   });
-}
+};
 
 
 /*---------------matchuser/:user_id---------------*/
@@ -153,7 +173,8 @@ exports.updateStateMessage = (req, res) => {
  * GET - 유저 user_id 중복 확인
  */
 exports.checkDuplicatedUserId = (req, res) => {
-  User.where({
+    knex('user')
+    .where({
       user_id: req.params.user_id,
   })
   .select('user_id')
@@ -173,7 +194,8 @@ exports.checkDuplicatedUserId = (req, res) => {
  * GET - 유저 닉네임 중복 확인
  */
 exports.checkDuplicatedUserNickname = (req, res) => {
-  User.where({
+    knex('user')
+    .where({
       nickname: req.params.nickname,
   })
   .select('nickName')

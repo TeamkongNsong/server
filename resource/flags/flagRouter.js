@@ -1,13 +1,13 @@
 const flagRouter = require('express').Router();
 const flagController = require('./flagController');
 
-/* route 순서
- * GET,
- * POST,
- * PUT,
- * DELETE
- */
-
+/*===========================================
+                정렬 순서
+                 * GET
+                 * POST
+                 * PUT
+                 * DELETE
+===========================================*/
 // flag on map
 flagRouter.route('/')
 .get(flagController.returnAllFlags)

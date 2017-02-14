@@ -1,18 +1,18 @@
-console.log('userRouter.js');
-
 const userRouter = require('express').Router();
 const userController = require('./userController');
 
-/* route 순서
- * GET,
- * POST,
- * PUT,
- * DELETE
- */
-
-// users
-userRouter.route('/')
-.put(userController.updateUser);
+/*===========================================
+                정렬 순서
+                 * GET
+                 * POST
+                 * PUT
+                 * DELETE
+===========================================*/
+/*===========================================
+                  CHANGE
+===========================================*/
+userRouter.route('/change/nickname')
+.put(userController.changeUserNickname);
 
 // users/:id
 userRouter.route('/:user_id')

@@ -44,6 +44,7 @@ exports.signUpByWiki = (req, res) => {
             .then((data) => {
                 res.json({
                     msg: `${newUser.user_id}님이 가입하셨습니다.`,
+                    statuscode: 202,
                 });
             })
             .catch((err) => {

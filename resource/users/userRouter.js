@@ -24,6 +24,13 @@ userRouter.route('/:idx')
 userRouter.route('/search/:word')
 .get(userController.searchUser);
 
+/*----------matchusers id & nickname-------------*/
+userRouter.route('/matchuser_id/:user_id')
+.get(userController.checkDuplicatedUserId);
+
+userRouter.route('/matchuser_nickname/:nickname')
+.get(userController.checkDuplicatedUserNickname);
+/*------------------------------------------------*/
 
 // users profile
 //TODO: 닉네임 업데이트, -> 1주일에 한 번 가능하도록.
@@ -39,12 +46,6 @@ userRouter.route('/search/:word')
 // .put(userController.updateUserimg)
 // .delete(userController.deleteUserimg)
 
-/*----------matchusers id & nickname-------------*/
-userRouter.route('/matchuser_id/:user_id')
-.get(userController.checkDuplicatedUserId);
 
-userRouter.route('/matchuser_nickname/:nickname')
-.get(userController.checkDuplicatedUserNickname);
-/*------------------------------------------------*/
 
 module.exports = userRouter;

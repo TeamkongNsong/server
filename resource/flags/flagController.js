@@ -1,96 +1,193 @@
 const knex = require('../../model/knex.js');
+const config = require('../../config.js');
 
-/*---------------flags---------------*/
-/*
- * GET
- */
-exports.returnAllFlags = (req, res) => {
-  console.log('checking returnFlags', req.body);
-  knex("user_flag")
-  .select()
-  .then((data) => {
-    res.send(data);
-  })
-  .catch((err) => {
-    console.log("err on returnAllFlags's user_flag table.", err);
-  });
+/*================================================
+                      COMMON
+================================================*/
+const handleError = (err) => {
+    console.log(err);
 };
 
+
+/*================================================
+                       FLAGS
+================================================*/
+/*
+ * GET - get all flags
+ */
+exports.getAllFlags = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+
+    knex("user_flag")
+        .then((flags) => {
+            res.json({
+                flags,
+                logInfo: {
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+/*
+ * DELETE
+ */
+exports.deleteAllFlags = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers['x-access-token'];
+    const device_info = req.headers.device_info;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+
+    knex('user_flag')
+        .del()
+        .then(() => {
+            res.json({
+                msg: "deleted all flags succesfully!",
+                logInfo: {
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+
+/*================================================
+                       ME
+================================================*/
 /*
  * POST
  */
 exports.pinFlag = (req, res) => {
-  console.log('checking insertFlag', req.body);
-  const date = new Date();
-  date.setHours(date.getHours() + 9);
-  knex('user')
-  .where({
-    nickname: req.body.nickname,
-  })
-  .select('idx')
-  .then((data) => {
-    knex('user_flag')
-    .insert({
-        user_idx: data[0].idx,
-        nickname: req.body.nickname,
-        title: req.body.title,
-        message: req.body.message,
-        latitude: req.body.region.latitude,
-        longitude: req.body.region.longitude,
-        date,
-    })
-    .then((data) => {
-        res.json({
-            "message": "깃발을 박았습니다."
-        });
-        res.end();
-    })
-    .catch((err) => {
-      console.log("err on pinFlag's user_flag table.", err);
-    });
-  })
-  .catch((err) => {
-    console.log("err on pinFlag's user table.", err);
-  });
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+    const {
+        title,
+        message,
+    } = req.body;
+    const {
+        latitude,
+        longtitude,
+    } = req.body.region;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('title', 'title is required').notEmpty();
+    req.checkBody('message', 'message is required').notEmpty();
+    req.checkBody('latitude', 'latitude is required').notEmpty();
+    req.checkBody('longtitude', 'longtitude is required').notEmpty();
+
+    knex('user')
+        .where({
+            id_token,
+        })
+        .then((data) => {
+            const idx = data[0].idx;
+            const nickname = data[0].nickname;
+            knex('user_flag')
+                .insert({
+                    user_idx: idx,
+                    nickname,
+                    title,
+                    message,
+                    latitude,
+                    longtitude,
+                    created_at: config.date,
+                })
+                .then((data) => {
+                    res.json({
+                        nickname,
+                        msg: "You got a flag!",
+                    });
+                })
+                .catch(handleError);
+        })
+        .catch(handleError);
 };
 
-/*---------------flags/:nickname?idx=--------------*/
-/*
- * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
- */
-exports.isMatchUserSelf = (req, res) => {
-  knex('user_flag')
-  .where({
-    idx: req.query.idx,
-  })
-  .select()
-  .then((flag) => {
-    console.log(flag);
-    const check = (flag[0].nickname === req.params.nickname) ? true : false;
-    res.send(check);
-  })
-  .catch((err) => {
-    console.log("err of isMatchUserSelf on flagController's onClickUserNickname and onClickFlagIdx", err);
-  });
-};
-
-
-/*---------------flags/:idx---------------*/
 /*
  * DELETE
  */
 exports.deleteMapFlag = (req, res) => {
-  knex('user_flag')
-  .where({
-    idx: req.params.idx,
-  })
-  .del()
-  .then(() => {
-    res.json({
-      "message": "deleted message succesfully!"
-    });
-  })
-  .catch((err) => {
-    console.log("err on deleteMapFlag's user_flag table.", err);
-  });
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers['x-access-token'];
+    const device_info = req.headers.device_info;
+    const { idx } = req.body;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('idx', 'idx is required').notEmpty();
+
+    knex('user_flag')
+        .where({
+            idx,
+        })
+        .del()
+        .then(() => {
+            res.json({
+                msg: "deleted message succesfully!",
+                logInfo: {
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+
+/*================================================
+                        CHECK
+================================================*/
+/*---------------flags/nickname?idx=--------------*/
+/*
+ * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
+ */
+exports.isMatchUserSelf = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('idx', 'idx is required').notEmpty();
+
+    knex('user_flag')
+        .where({
+            idx,
+        })
+        .then((flag) => {
+            const nickname = flag[0].nickname;
+            knex('user')
+                .where({
+                    nickname,
+                })
+                .select('id_token')
+                .then((data) => {
+                    console.log('dadta', data);
+                    const check = (data[0].id_token === id_token) ? true : false;
+                    res.json({
+                        check,
+                        logInfo: {
+                            device_info,
+                        },
+                    });
+                })
+                .catch(handleError);
+        })
+        .catch(handleError);
 };

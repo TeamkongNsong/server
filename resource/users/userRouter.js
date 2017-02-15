@@ -11,16 +11,16 @@ const userController = require('./userController');
 /*===========================================
                   CHANGE
 ===========================================*/
-userRouter.route('/change/nickname')
-.put(userController.changeUserNickname);
+userRouter.route('/')
+.get(userController.getAllUsers);
 
-// users/:id
-userRouter.route('/:user_id')
-.get(userController.retrieveUser)
+userRouter.route('/me')
+.get(userController.getMyInfo)
 .delete(userController.deleteUser);
 
+userRouter.route('/:idx')
+.get(userController.getUserInfo);
 
-//users/search/
 userRouter.route('/search/:word')
 .get(userController.searchUser);
 

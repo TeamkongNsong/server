@@ -10,7 +10,3 @@ exports.info = {
 
 exports.date = new Date();
 exports.date.setHours(exports.date.getHours() + 9);
-
-console.log('==================================');
-console.log('Welcome to WIKIUS');
-console.log('==================================');

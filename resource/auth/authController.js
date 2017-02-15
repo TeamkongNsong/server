@@ -212,8 +212,6 @@ const checkNickname = (user_id) => {
         .catch(handleError);
     });
 };
-
-
 /*========================================*/
 
 /*========================================
@@ -302,7 +300,6 @@ exports.checkNickname = (req, res) => {
         id_token,
     })
     .then((data) => {
-        console.log(data);
         const check = data[0].nickname !== null;
         res.json({
             check,

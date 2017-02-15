@@ -1,22 +1,29 @@
-console.log('authRouter.js');
-
 const authRouter = require('express').Router();
-const authContorller = require('./authController');
+const authController = require('./authController');
+/*===========================================
+                정렬 순서
+                 * GET
+                 * POST
+                 * PUT
+                 * DELETE
+===========================================*/
+/*===========================================
+                WIKI
+===========================================*/
+authRouter.route('/wiki/sign-up')
+.post(authController.signUpByWiki);
 
-/* 정렬 순서
- * GET
- * POST
- * PUT
- * DELETE
- */
+/*===========================================
+                COMMON
+===========================================*/
+authRouter.route('/sign-in')
+.post(authController.signIn);
 
-authRouter.route('/wiki/register')
-.post(authContorller.createWikiUser);
+authRouter.route('/sign-out')
+.put(authController.signOut);
 
-authRouter.route('/wiki/login')
-.post(authContorller.loginWiki);
+authRouter.route('/nickname')
+.put(authController.enrollNickname);
 
-authRouter.route('wiki/logout')
-.delete(authContorller.logoutWiki);
 
 module.exports = authRouter;

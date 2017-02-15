@@ -1,6 +1,4 @@
-console.log('knex.js');
-
-const config = require('../config.js');
+const config = require('../config.js').info;
 const knex = require('knex')({
   client: 'mysql',
   connection: {

@@ -2,12 +2,10 @@ const knex = require('../../model/knex.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../../config.js');
-const checkNickname = require('./check.js').checkNickname;
 
-/*--------------wiki/sign-up/--------------*/
-/*
- * POST 위키 유저 생성 및 등록.
- */
+/*========================================
+* POST        WIKIS SIGN UP
+========================================*/
 exports.signUpByWiki = (req, res) => {
     const { user_id, password, password2 } = req.body;
     const newUser = {
@@ -46,7 +44,6 @@ exports.signUpByWiki = (req, res) => {
             .then((data) => {
                 res.json({
                     msg: `${newUser.user_id}님이 가입하셨습니다.`,
-                    statusCode: 202,
                 });
             })
             .catch((err) => {
@@ -74,237 +71,187 @@ exports.signUpByWiki = (req, res) => {
     }
 };
 
-/*--------------wiki/sign-in/--------------*/
-/*
- * POST 위키 유저 로그인시 토큰 발행
- */
-exports.signInByWiki = (req, res) => {
-    const { user_id, password } = req.body;
+/*========================================
+* POST           SIGN IN
+========================================*/
+exports.signIn = (req, res) => {
     const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers['x-access-token'];
     const device_info = req.headers.device_info;
     const secret = req.app.get('jwt-secret');
+    const { user_id, password } = req.body;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkBody('user_id', 'user_id is required').notEmpty();
-    req.checkBody('password', 'Password is required').notEmpty();
 
-    const errors = req.validationErrors();
-
-    if (errors) {
+    return new Promise((resolve, reject) => {
+        if (service_issuer === 'wiki') {
+            return checkIdAndPassword(user_id, password)
+                .then((isMatch) => {
+                    if (!isMatch) return res.send(isMatch);
+                    resolve();
+                });
+        } else if (service_issuer === 'google') {
+            return hasAlreadyUser(user_id)
+            .then((check) => {
+                if (check) return resolve(user_id);
+                insertUserInfo(user_id)
+                .then(() => {
+                    console.log('1', user_id);
+                    resolve();
+                });
+            });
+        }
+    })
+    .then(() => tokenUpdate(user_id, service_issuer, secret, id_token))
+    .then(() => checkNickname(user_id))
+    .then((check) => {
         res.json({
-            msg: errors
+            check,
+            msg: `check a boolean.`
         });
-    } else {
+    })
+    .catch(handleError);
+};
+
+//wiki
+const checkIdAndPassword = (user_id, password) => {
+    return knex('user')
+    .where({
+        user_id,
+    })
+    .then((user) => {
+        const hash = user[0].password;
+        return bcrypt.compare(password, hash);
+    })
+    .catch(handleError);
+};
+
+const makeToken = (user_id, secret) => {
+    return new Promise((resolve, reject) => {
+        jwt.sign(
+            {
+                user_id,
+            },
+            secret,
+            {
+                expiresIn: '7d',
+                issuer: 'pmirihss',
+                subject: 'userInfo'
+            },
+            (err, token) => {
+                if (err) reject(err);
+                resolve(token);
+            }
+        );
+    });
+};
+/*---------------------절취선-----------------------*/
+//google
+const hasAlreadyUser = (user_id) => {
+    return knex('user')
+    .where({
+        user_id,
+    })
+    .then((user) => {
+        const check = user.length > 0;
+        return check;
+    })
+    .catch(handleError);
+};
+
+const insertUserInfo = (user_id) => {
+    return knex('user')
+    .insert({
+        user_id,
+        email: user_id,
+    })
+    .catch(handleError);
+};
+
+
+/*---------------------절취선-----------------------*/
+
+const tokenUpdate = (user_id, service_issuer, secret, id_token) => {
+    return new Promise((resolve, reject) => {
+        if (service_issuer === 'wiki') {
+            makeToken(user_id, secret)
+            .then((token) => {
+                resolve(token);
+            });
+        } else if (service_issuer === 'google') {
+            console.log(user_id, service_issuer, id_token);
+            resolve(id_token);
+        }
+    })
+    .then((token) => {
+        return knex('user')
+        .where({
+            user_id,
+        })
+        .update({
+            id_token: token,
+        })
+        .catch(handleError);
+    })
+    .catch(handleError);
+};
+
+const checkNickname = (user_id) => {
+    return new Promise((resolve, reject) => {
         knex('user')
         .where({
             user_id,
         })
         .then((user) => {
-            const hash = user[0].password;
-            bcrypt.compare(password, hash, (err, isMatch) => {
-                if (err) throw err;
-                else if (isMatch) {
-                    return new Promise((resolve, reject) => {
-                        jwt.sign(
-                            {
-                                user_id: user.user_id,
-                            },
-                            secret,
-                            {
-                                expiresIn: '7d',
-                                issuer: 'pmirihss',
-                                subject: 'userInfo'
-                            },
-                            (err, token) => {
-                                if (err) reject(err);
-                                resolve(token);
-                            }
-                        );
-                    })
-                    .then((token) => {
-                        knex('user')
-                        .where({
-                            user_id: user[0].user_id
-                        })
-                        .update({
-                            id_token: token,
-                        })
-                        .then((data) => {
-                            let check;
-                            knex('user')
-                            .where({
-                                user_id,
-                            })
-                            .select('nickname')
-                            .then((data) => {
-                                const nickname = data[0].nickname;
-                                check = nickname !== null ? true : false;
-                                res.json({
-                                    msg: 'logged in successfully',
-                                    token,
-                                    check: `${check}`,
-                                });
-                            })
-                            .catch((err) => {
-                                error = err.message;
-                            });
-                        })
-                        .catch((err) => {
-                            res.status(403).json({
-                                msg: err.message,
-                            });
-                        });
-                    })
-                    .catch((err) => {
-                        res.status(400).json({
-                            msg: err.message,
-                        });
-                    });
-                }
-            });
+            const check = user[0].nickname !== null;
+            resolve(check);
         })
-        .catch((err) => {
-            res.status(404).json({
-                msg: err.message,
-            });
-        });
-    }
-};
-
-
-/*--------------wiki/sign-out/--------------*/
-/*
- * DELETE 위키 유저 로그아웃시 토큰 초기화
- */
-exports.signOutByWiki = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
-    const { user_id } = req.body;
-
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkBody('user_id', 'user_id is required').notEmpty();
-
-    knex('user')
-    .where({
-        id_token,
-    })
-    .update({
-        id_token: null,
-    })
-    .then((data) => {
-        console.log(data);
-        res.json({
-            msg: `${service_issuer}, ${user_id}님이 ${device_info}로 로그아웃 하였습니다.`,
-            logInfo: {
-                user_id,
-                device_info,
-            },
-            statusCode: 202,
-        });
-        res.end();
-    })
-    .catch((err) => {
-        res.json({
-            msg: err,
-            statusCode: 404,
-        });
+        .catch(handleError);
     });
 };
 
-// /*--------------google/register/--------------*/
-// /*
-//  * POST - 구글의 토큰 등록.
-//  */
-exports.registerToken = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers['x-access-token'];
-    const device_info = req.headers.device_info;
-    const { username } = req.body;
 
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkBody('username', 'username is required').notEmpty();
+/*========================================*/
 
-    const errors = req.validationErrors();
-
-    if (errors) {
-        res.json({
-            errors,
-        });
-        res.end();
-    } else {
-        knex('user')
-        .insert({
-            id_token,
-        })
-        .then(() => {
-            res.json({
-                msg: 'thanks',
-                logInfo: {
-                    username,
-                    device_info,
-                },
-            });
-        })
-        .catch((err) => {
-            res.json({
-                err: err.message,
-            });
-        });
-    }
-};
-
-/*--------------google/sign-up/--------------*/
-/*
- * PUT 닉네임 및 유저 정보 등록.
- */
-exports.signUpBygoogle = (req, res) => {
+/*========================================
+* PUT          ENOROLL NICNAME
+========================================*/
+exports.enrollNickname = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];
     const device_info = req.headers.device_info;
-    const { nickname, username, email } = req.body;
-
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    const { nickname } = req.body;
 
     knex('user')
     .where({
         id_token,
     })
     .update({
-        user_id: email,
         nickname,
-        username,
-        email,
+        device_info,
+        created_at: config.date,
     })
-    .then((result) => {
+    .then(() => {
         res.json({
-            msg: `${service_issuer}(을)를 통해 ${nickname}님이 ${device_info}로 로그인 하였습니다.`,
+            msg: `${service_issuer}, ${nickname}님이 ${device_info}로 회원가입을 완료하였습니다.`,
             logInfo: {
-                user_id: email,
+                nickname,
+                created_at: config.date,
                 device_info,
             },
         });
     })
     .catch((err) => {
-        console.log(err);
-        res.json({
-            msg: err.message
-        });
+        console.log("err on updateNickname's user table", err);
     });
 };
 
-/*--------------google/sign-out/--------------*/
-/*
- * PUT - sign out by User Logged in Google
- */
-exports.signOutByGoogle = (req, res) => {
+/*========================================
+* PUT           SIGN OUT
+========================================*/
+exports.signOut = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];
     const device_info = req.headers.device_info;
@@ -328,6 +275,7 @@ exports.signOutByGoogle = (req, res) => {
             msg: `${service_issuer}, ${user_id}님이 ${device_info}로 로그아웃 하였습니다.`,
             logInfo: {
                 user_id,
+                date: config.date,
                 device_info,
             },
         });
@@ -339,108 +287,6 @@ exports.signOutByGoogle = (req, res) => {
     });
 };
 
-/*--------------google/sign-out/--------------*/
-/*
- * PUT - 새 토큰 발행.
- */
-exports.newToken = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
-    const { email } = req.body;
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    console.log(id_token);
-    knex('user')
-    .where({
-        email,
-    })
-    .update({
-        id_token,
-    })
-    .then(() => {
-        res.json({
-            msg: `새 토큰을 발행했습니다.`,
-            logInfo: {
-                user_id: email,
-                device_info,
-            },
-        });
-    })
-    .catch((err) => {
-        res.json({
-            msg: err.message
-        });
-    });
-
-};
-
-/*---------------/common/check/nickname---------------*/
-/*
-* GET - 유저 닉네임 확인
-*/
-exports.checkNickname = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
-
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-
-    knex('user')
-    .where({
-        id_token,
-    })
-    .select('nickname')
-    .then((data) => {
-        console.log(data);
-        const check = data[0].nickname !== null ? true : false;
-        res.json({
-            msg: 'this check is what has checked whether already existed nickname.',
-            check,
-            logInfo: {
-                device_info,
-            },
-        });
-    })
-    .catch((err) => {
-        res.json({
-            msg: err.message,
-        });
-    });
-};
-
-/*---------------/common/nickname---------------*/
-/*
-* PUT - 유저 닉네임 등록
-*/
-exports.enrollNickname = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
-    const { nickname } = req.body;
-
-    knex('user')
-    .where({
-        id_token,
-    })
-    .update({
-        nickname,
-        device_info,
-        created_at: config.date,
-    })
-    .then(() => {
-        res.json({
-            msg: `${service_issuer}, ${nickname}님이 ${device_info}로 회원가입을 완료하였습니다.`,
-            logInfo: {
-                nickname,
-                device_info,
-            },
-        });
-    })
-    .catch((err) => {
-        console.log("err on updateNickname's user table", err);
-    });
+const handleError = (err) => {
+    console.log(err);
 };

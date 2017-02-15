@@ -1,6 +1,5 @@
 const authRouter = require('express').Router();
 const authController = require('./authController');
-
 /*===========================================
                 정렬 순서
                  * GET
@@ -8,41 +7,22 @@ const authController = require('./authController');
                  * PUT
                  * DELETE
 ===========================================*/
-
 /*===========================================
-                auth WIKI
+                WIKI
 ===========================================*/
 authRouter.route('/wiki/sign-up')
 .post(authController.signUpByWiki);
 
-authRouter.route('/wiki/sign-in')
-.post(authController.signInByWiki);
-
-authRouter.route('/wiki/sign-out')
-.put(authController.signOutByWiki);
-
-/*===========================================
-                auth GOOGLE
-===========================================*/
-authRouter.route('/google/register')
-.post(authController.registerToken);
-
-authRouter.route('/google/sign-up')
-.put(authController.signUpBygoogle);
-
-authRouter.route('/google/sign-out')
-.put(authController.signOutByGoogle);
-
-authRouter.route('/google/newToken')
-.put(authController.newToken);
-
 /*===========================================
                 COMMON
 ===========================================*/
-authRouter.route('/common/check/nickname')
-.get(authController.checkNickname);
+authRouter.route('/sign-in')
+.post(authController.signIn);
 
-authRouter.route('/common/nickname')
+authRouter.route('/sign-out')
+.put(authController.signOut);
+
+authRouter.route('/nickname')
 .put(authController.enrollNickname);
 
 

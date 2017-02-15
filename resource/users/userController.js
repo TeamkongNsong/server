@@ -70,7 +70,7 @@ exports.getMyInfo = (req, res) => {
         .catch(handleError);
 };
 
-/*
+/* TODO: 보류
  * DELETE - 유저 삭제
  */
 exports.deleteUser = (req, res) => {
@@ -79,7 +79,7 @@ exports.deleteUser = (req, res) => {
     const device_info = req.headers.device_info;
     const {
         user_id
-    } = req.params;
+    } = req.body;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
@@ -94,7 +94,7 @@ exports.deleteUser = (req, res) => {
         .then(() => {
             db.knex('user')
                 .where({
-                    user_id: req.params.user_id,
+                    user_id,
                 })
                 .del()
                 .then(() => {
@@ -137,7 +137,6 @@ exports.getUserInfo = (req, res) => {
             idx,
         })
         .then((user) => {
-            console.log(user);
             res.json({
                 user: user[0],
                 logInfo: {
@@ -168,7 +167,7 @@ exports.searchUser = (req, res) => {
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkQuery('word', 'word is required').notEmpty();
+    req.checkParams('word', 'word is required').notEmpty();
 
     knex('user')
         .select()
@@ -226,6 +225,10 @@ exports.checkDuplicatedUserId = (req, res) => {
             const check = data.length ? true : false;
             res.json({
                 check,
+                logInfo: {
+                    user_id,
+                    device_info,
+                },
             });
         })
         .catch(handleError);

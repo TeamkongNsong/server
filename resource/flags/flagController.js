@@ -78,7 +78,7 @@ exports.pinFlag = (req, res) => {
     } = req.body;
     const {
         latitude,
-        longtitude,
+        longitude,
     } = req.body.region;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();

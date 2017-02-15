@@ -151,7 +151,7 @@ exports.deleteMapFlag = (req, res) => {
 /*================================================
                         CHECK
 ================================================*/
-/*---------------flags/nickname?idx=--------------*/
+/*---------------flags/check/?idx=--------------*/
 /*
  * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
  */
@@ -159,12 +159,12 @@ exports.isMatchUserSelf = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];
     const device_info = req.headers.device_info;
-
+    const { idx } = req.query;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkBody('idx', 'idx is required').notEmpty();
+    req.checkQuery('idx', 'idx is required').notEmpty();
 
     knex('user_flag')
         .where({
@@ -178,8 +178,10 @@ exports.isMatchUserSelf = (req, res) => {
                 })
                 .select('id_token')
                 .then((data) => {
-                    console.log('dadta', data);
                     const check = (data[0].id_token === id_token) ? true : false;
+                    console.log('dadta', data);
+                    console.log('check', check);
+
                     res.json({
                         check,
                         logInfo: {

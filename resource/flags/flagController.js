@@ -87,7 +87,7 @@ exports.pinFlag = (req, res) => {
     req.checkBody('title', 'title is required').notEmpty();
     req.checkBody('message', 'message is required').notEmpty();
     req.checkBody('latitude', 'latitude is required').notEmpty();
-    req.checkBody('longtitude', 'longtitude is required').notEmpty();
+    req.checkBody('longitude', 'longitude is required').notEmpty();
 
     knex('user')
         .where({
@@ -103,7 +103,7 @@ exports.pinFlag = (req, res) => {
                     title,
                     message,
                     latitude,
-                    longtitude,
+                    longitude,
                     created_at: config.date,
                 })
                 .then((data) => {

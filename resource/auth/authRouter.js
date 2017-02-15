@@ -25,5 +25,9 @@ authRouter.route('/sign-out')
 authRouter.route('/nickname')
 .put(authController.enrollNickname);
 
+authRouter.route('/check/nickname')
+.get(authController.checkNickname);
+
+
 
 module.exports = authRouter;

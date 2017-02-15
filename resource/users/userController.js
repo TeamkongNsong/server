@@ -2,6 +2,10 @@ const knex = require('../../model/knex.js');
 const Hangul = require('hangul-js');
 const config = require('../../config.js');
 
+
+const handleError = (err) => {
+    console.log(err);
+};
 /*---------------/change/nickname---------------*/
 /*
 * PUT - 유저 닉네임 업데이트
@@ -21,10 +25,6 @@ exports.changeUserNickname = (req, res) => {
     .where({
         id_token,
     })
-    .select()
-    .then((data) => {
-        console.log(data);
-    })
     .update({
         nickname,
         changed_at: config.date,
@@ -34,11 +34,7 @@ exports.changeUserNickname = (req, res) => {
             msg: 'nickname updated!'
         });
     })
-    .catch((err) => {
-        res.json({
-            msg: `err on nicname updating :: ${err}`
-        });
-    });
+    .catch(handleError);
 };
 
 

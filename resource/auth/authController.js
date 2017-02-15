@@ -44,7 +44,7 @@ exports.signUpByWiki = (req, res) => {
             .then((data) => {
                 res.json({
                     msg: `${newUser.user_id}님이 가입하셨습니다.`,
-                    statuscode: 202,
+                    statusCode: 200,
                 });
             })
             .catch((err) => {
@@ -286,6 +286,30 @@ exports.signOut = (req, res) => {
             msg: err.message
         });
     });
+};
+
+exports.checkNickname = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+
+    knex('user')
+    .where({
+        id_token,
+    })
+    .then((data) => {
+        console.log(data);
+        const check = data[0].nickname !== null;
+        res.json({
+            check,
+            msg: `check a boolean.`
+        });
+    })
+    .catch(handleError);
 };
 
 const handleError = (err) => {

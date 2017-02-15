@@ -59,7 +59,6 @@ exports.getMyInfo = (req, res) => {
         })
         .select()
         .then((user) => {
-            console.log(user);
             res.json({
                 user: user[0],
                 logInfo: {

@@ -3,18 +3,243 @@ const Hangul = require('hangul-js');
 const config = require('../../config.js');
 
 
+/*================================================
+                      COMMON
+================================================*/
 const handleError = (err) => {
     console.log(err);
 };
-/*---------------/change/nickname---------------*/
+
+/*================================================
+                      USERS
+================================================*/
 /*
-* PUT - 유저 닉네임 업데이트
-*/
-exports.changeUserNickname = (req, res) => {
+ * GET - 모든 유저 정보 가져오기
+ */
+exports.getAllUsers = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];
     const device_info = req.headers.device_info;
-    const { nickname } = req.body;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+
+    knex('user')
+        .select()
+        .then((users) => {
+            res.json({
+                users,
+                logInfo: {
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+/*================================================
+                        ME
+================================================*/
+/*
+ * GET - 내 정보 가져오기
+ */
+exports.getMyInfo = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+
+    knex('user')
+        .where({
+            id_token,
+        })
+        .select()
+        .then((user) => {
+            console.log(user);
+            res.json({
+                user: user[0],
+                logInfo: {
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+/*
+ * DELETE - 유저 삭제
+ */
+exports.deleteUser = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+    const {
+        user_id
+    } = req.params;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('user_id', 'user_id is required').notEmpty();
+
+    knex('user_flag')
+        .where({
+            user_id,
+        })
+        .del()
+        .then(() => {
+            db.knex('user')
+                .where({
+                    user_id: req.params.user_id,
+                })
+                .del()
+                .then(() => {
+                    res.json({
+                        msg: "유저 데이터 삭제 완료.",
+                        logInfo: {
+                            user_id,
+                            device_info,
+                        },
+                    });
+                })
+                .catch(handleError);
+        })
+        .catch(handleError);
+};
+
+
+/*================================================
+                    ONE OTHER
+================================================*/
+/*---------------users/:idx---------------*/
+/*
+ * GET - 다른 *한 사람* 유저 정보 get하기
+ */
+exports.getUserInfo = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+    const {
+        idx
+    } = req.params;
+    console.log(idx);
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkParams('idx', 'idx is required').notEmpty();
+
+    knex('user')
+        .where({
+            idx,
+        })
+        .then((user) => {
+            console.log(user);
+            res.json({
+                user: user[0],
+                logInfo: {
+                    user_id: user[0].user_id,
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+
+/*================================================
+                      SEARCH
+================================================*/
+/*---------------users/search/:word---------------*/
+/*
+ * GET - 유저 초성 검색(main 화면) - 2.11
+ */
+exports.searchUser = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers["x-access-token"];
+    const device_info = req.headers.device_info;
+    const {
+        word
+    } = req.params;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkQuery('word', 'word is required').notEmpty();
+
+    knex('user')
+        .select()
+        .then((users) => {
+            const searcher = new Hangul.Searcher(`${word}`);
+            const result = [];
+            users.forEach((user) => {
+                if (searcher.search(user.nickname) !== -1) {
+                    result.push({
+                        idx: user.idx,
+                        img: user.img,
+                        nickname: user.nickname,
+                        state_message: user.state_message,
+                    });
+                }
+            });
+
+            res.json({
+                result,
+                msg: 'here',
+                logInfo: {
+                    device_info,
+                },
+            });
+        })
+        .catch(handleError);
+};
+
+
+/*================================================
+                    MATCH_USER
+================================================*/
+/*---------------matchuser/:user_id---------------*/
+/*
+ * GET - 유저 user_id 중복 확인
+ */
+exports.checkDuplicatedUserId = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const device_info = req.headers.device_info;
+    const {
+        user_id
+    } = req.params;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('user_id', 'user_id is required').notEmpty();
+
+    knex('user')
+        .where({
+            user_id,
+        })
+        .select('user_id')
+        .then((data) => {
+            const check = data.length ? true : false;
+            res.json({
+                check,
+            });
+        })
+        .catch(handleError);
+};
+/*---------------matchuser/:nickname---------------*/
+/*
+ * GET - 유저 닉네임 중복 확인
+ */
+exports.checkDuplicatedUserNickname = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const device_info = req.headers.device_info;
+    const {
+        nickname
+    } = req.params;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
@@ -22,184 +247,20 @@ exports.changeUserNickname = (req, res) => {
     req.checkBody('nickname', 'nickname is required').notEmpty();
 
     knex('user')
-    .where({
-        id_token,
-    })
-    .update({
-        nickname,
-        changed_at: config.date,
-    })
-    .then((resa) => {
-        res.json({
-            msg: 'nickname updated!'
-        });
-    })
-    .catch(handleError);
-};
-
-
-
-/*---------------users/:id---------------*/
-
-/*
- * DELETE - 유저 삭제(회원 탈퇴)
- */
-exports.deleteUser = (req, res) => {
-    knex('user_flag')
-    .where({
-        user_id: req.params.user_id,
-    })
-    .del()
-    .then(() => {
-        res.json({
-            "message": "유저 데이터 삭제 중."
-        });
-    })
-    .catch((err) => {
-        console.log("err on deleteUser's user_flag table", err);
-    });
-
-    db.knex('user')
         .where({
-            user_id: req.params.user_id,
+            nickname,
         })
-        .del()
-        .then(() => {
+        .select('nickName')
+        .then((data) => {
+            const check = data.length ? true : false;
             res.json({
-                "message": "유저 데이터 삭제 완료."
+                check,
+                msg: 'did!',
+                logInfo: {
+                    nickname,
+                    device_info,
+                },
             });
         })
-        .catch((err) => {
-            console.log("err on deleteUser's user table", err);
-    });
-};
-
-
- /*---------------users/:nickname?user_id=..--------------*/
- /*
-  * GET: 프로필 들어갈 때 자기 프로필인지 아닌지 true, false로 응답
- exports.isMatchUserSelf = (req, res) => {
-   db.knex('user')
-   .where({
-     user_id: req.query.user_id,
-   })
-   .select()
-   .then((user) => {
-     console.log(user);
-     const check = (user[0].nickname === req.params.nickname) ? true : false;
-     res.send(check);
-   })
-   .catch((err) => {
-     console.log("err of isMatchUserSelf on userController's onClickUserNickname and onClickId", err);
-   });
- }
- */
-
-/*---------------users/:user_id---------------*/
-/*
- * GET - 유저 검색
- */
-exports.retrieveUser = (req, res) => {
-    knex('user')
-    .where({
-     user_id: req.params.user_id,
-   })
-   .select()
-   .then((data) => {
-     console.log(data);
-     res.send(data[0]);
-   })
-   .catch((err) => {
-     console.log("err on retrieveUser's user table", err);
-   });
-};
-
-
-/*---------------users/search/:word---------------*/
-/*
- * GET - 유저 초성 검색(main 화면) - 2.11
- */
-exports.searchUser = (req, res) => {
-  knex('user')
-  .select()
-  .then((users) => {
-    const searcher = new Hangul.Searcher(`${req.params.word}`);
-    const result = [];
-    users.forEach((user) => {
-      if (searcher.search(user.nickname) !== -1) {
-        result.push({
-          img: user.img,
-          nickname: user.nickname,
-          state_message: user.state_message,
-        });
-      }
-    });
-    res.send(result);
-  });
- };
-
-
-/*---------------profile/state_message/---------------*/
-/*
-* PUT - 유저 프로필 상태메세지 업데이트(본인)
-*/
-exports.updateStateMessage = (req, res) => {
-    knex('user')
-    .where({
-    user_id: req.body.user_id,
-  })
-  .select('state_message')
-  .update({
-    state_message: req.body.state_message,
-  })
-  .then(() => {
-    res.json({
-      msg: "상태메세지를 업데이트했습니다."
-  });
-    res.end();
-  })
-  .catch((err) => {
-    console.log("err on updateStateMessage's user table", err);
-  });
-};
-
-
-/*---------------matchuser/:user_id---------------*/
-/*
- * GET - 유저 user_id 중복 확인
- */
-exports.checkDuplicatedUserId = (req, res) => {
-    knex('user')
-    .where({
-      user_id: req.params.user_id,
-  })
-  .select('user_id')
-  .then((data) => {
-    const check = data.length ? true : false;
-    res.send(check);
-  })
-  .catch((err) => {
-    console.log("err on checkUserId's user", err);
-  });
-};
-
-
-
-/*---------------matchuser/:nickname---------------*/
-/*
- * GET - 유저 닉네임 중복 확인
- */
-exports.checkDuplicatedUserNickname = (req, res) => {
-    knex('user')
-    .where({
-      nickname: req.params.nickname,
-  })
-  .select('nickName')
-  .then((data) => {
-      const check = data.length ? true : false;
-      res.send(check);
-  })
-  .catch((err) => {
-    console.log("err on checkUserNickName", err);
-  });
+        .catch(handleError);
 };

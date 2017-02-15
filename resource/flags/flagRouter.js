@@ -10,14 +10,15 @@ const flagController = require('./flagController');
 ===========================================*/
 // flag on map
 flagRouter.route('/')
-.get(flagController.returnAllFlags)
-.post(flagController.pinFlag);
+.get(flagController.getAllFlags)
+.delete(flagController.deleteAllFlags);
 
-flagRouter.route('/:nickname')
-.get(flagController.isMatchUserSelf);
-
-flagRouter.route('/:idx')
+flagRouter.route('/me')
+.post(flagController.pinFlag)
 .delete(flagController.deleteMapFlag);
+
+flagRouter.route('/check/:nickname')
+.get(flagController.isMatchUserSelf);
 
 
 module.exports = flagRouter;

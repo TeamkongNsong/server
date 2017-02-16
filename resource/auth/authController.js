@@ -85,6 +85,8 @@ exports.signIn = (req, res) => {
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('user_id', 'user_id is required').notEmpty();
+    req.checkBody('password', 'password is required').notEmpty();
 
     return new Promise((resolve, reject) => {
         if (service_issuer === 'wiki') {
@@ -106,10 +108,10 @@ exports.signIn = (req, res) => {
         }
     })
     .then(() => tokenUpdate(user_id, service_issuer, secret, id_token))
-    .then(() => checkNickname(user_id))
-    .then((check) => {
+    .then((token) => checkNickname(user_id, token))
+    .then((data) => {
         res.json({
-            check,
+            data,
             msg: `check a boolean.`
         });
     })
@@ -182,7 +184,6 @@ const tokenUpdate = (user_id, service_issuer, secret, id_token) => {
                 resolve(token);
             });
         } else if (service_issuer === 'google') {
-            console.log(user_id, service_issuer, id_token);
             resolve(id_token);
         }
     })
@@ -194,12 +195,15 @@ const tokenUpdate = (user_id, service_issuer, secret, id_token) => {
         .update({
             id_token: token,
         })
+        .then(() => {
+            return token;
+        })
         .catch(handleError);
     })
     .catch(handleError);
 };
 
-const checkNickname = (user_id) => {
+const checkNickname = (user_id, token) => {
     return new Promise((resolve, reject) => {
         knex('user')
         .where({
@@ -207,7 +211,11 @@ const checkNickname = (user_id) => {
         })
         .then((user) => {
             const check = user[0].nickname !== null;
-            resolve(check);
+            const data = {
+                check,
+                token,
+            };
+            resolve(data);
         })
         .catch(handleError);
     });
@@ -219,9 +227,14 @@ const checkNickname = (user_id) => {
 ========================================*/
 exports.enrollNickname = (req, res) => {
     const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
+    const id_token = req.headers['x-access-token'];
     const device_info = req.headers.device_info;
     const { nickname } = req.body;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('nickname', 'nickname is required').notEmpty();
 
     knex('user')
     .where({

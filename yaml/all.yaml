@@ -1,0 +1,963 @@
+swagger: '2.0'
+info:
+  version: "1.0"
+  title: Authentication
+paths:
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+#
+#                AUTH
+#
+#=======================================#
+  /auth/wiki/sign-up:
+    post:
+      description: |
+        sign-up with wiki.
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              body:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  password:
+                    type: string
+                  password2:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+
+  /auth/sign-in:
+    post:
+      description: |
+        sign-in.
+      parameters:
+        -
+          name: sign-in
+          in: body, headers
+          description: user_id, password
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  password:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                check:
+                  type: boolean
+                msg:
+                  type: string
+
+  /auth/nickname:
+    put:
+      description: |
+        enroll nickname.
+      parameters:
+        -
+          name: nickname
+          in: body, headers
+          description: nickname,
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              headers:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    nickname:
+                      type: string
+                    created_at:
+                      type: string
+                    device_info:
+                      type: strng
+
+  /auth/sign-out:
+    post:
+      description: |
+        common sign-out.
+      parameters:
+        -
+          name: sign-out
+          in: body, headers
+          description: user_id
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              headers:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    date:
+                      type: string
+                    device_info:
+                      type: strng
+
+  /auth/check/nickname:
+    post:
+      description: |
+        common check nickname
+      parameters:
+        -
+          name: check nickname
+          in: headers
+          description: get a boolean!
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                check:
+                  type: string
+                msg:
+                  type: string
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+
+#=======================================#
+#
+#                USERS
+#
+#=======================================#
+
+
+  /users:
+    get:
+      tags:
+      - getAllUsers
+      summary: 모든 유저 정보 가져오기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: getAllUsers
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                users:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+  /users/me:
+    get:
+      tags:
+      - getMyInfo
+      summary: 내 정보 가져오기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: getMyInfo
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                user:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+    delete:
+      tags:
+      - deleteUser
+      summary: 유저 삭제
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: deleteUser
+        in: headers body
+        description:
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  user_id:
+                    type: object
+
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+  /users/:idx:
+    get:
+      tags:
+      - getUserInfo
+      summary: 다른 *한 사람* 유저 정보 get하기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: getUserInfo
+        in: headers params
+        description:
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              params:
+                type: object
+                properties:
+                  idx:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                user:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+  /users/search/:word:
+    get:
+      tags:
+      - searchUser
+      summary: 유저 초성 검색
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: searchUser
+        in: headers params
+        description:
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              params:
+                type: object
+                properties:
+                  word:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                result:
+                  type: object
+                  properties:
+                    idx:
+                      type: string
+                    img:
+                      type: string
+                    nickname:
+                      type: string
+                    state_message:
+                      type: string
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+  /matchuser_id/:user_id:
+    get:
+      tags:
+      - checkDuplicatedUserId
+      summary: 유저 user_id 중복 확인
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: checkDuplicatedUserId
+        in: headers params
+        description: user_id
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              params:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                check:
+                  type: boolean
+                logInfo:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+  /matchuser_nickname/:nickname:
+    get:
+      tags:
+      - checkDuplicatedUserNickname
+      summary: 유저 닉네임 중복 확인
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: checkDuplicatedUserNickname
+        in: headers params
+        description:
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              params:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                check:
+                  type: boolean
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    nickname:
+                      type: string
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+
+#=======================================#
+#
+#                FLAGS
+#
+#=======================================#
+
+  /flags:
+    get:
+      tags:
+      - getAllFlags
+      summary: 모든 깃발 가져오기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: getAllFlags
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title: flags
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                flags:
+                  type: object
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    delete:
+      tags:
+      - deleteAllFlags
+      summary: 모든 깃발 삭제.
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: deleteAllFlags
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title: delete
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+  /flags/me:
+    post:
+      tags:
+      - pinFlag
+      summary: 깃발 박기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  message:
+                    type: string
+                  region:
+                    type: object
+                    properties:
+                      latitude:
+                        type: string
+                      longitude:
+                        type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    delete:
+      tags:
+      - deleteMapFlag
+      summary: 깃발 삭제
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: deleteMapFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  idx:
+                    type: boolean
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+  /flags/check/:idx:
+    get:
+      tags:
+      - isMatchUserSelf
+      summary: 깃발이 내껀지 아닌지.
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: isMatchUserSelf
+        in: headers params
+        description: null
+        required: true
+        type: array
+        items:
+          title:
+          type: object
+          properties:
+            headers:
+              type: object
+              properties:
+                service_issueur:
+                  type: string
+                id_token:
+                  type: string
+                device_info:
+                  type: string
+            params:
+              type: object
+              properties:
+                idx:
+                  type: boolean
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                check:
+                  type: boolean
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+host: virtserver.swaggerhub.com
+schemes:
+ - https
+ - http
+basePath: /sshirimp/AUTH/1.0

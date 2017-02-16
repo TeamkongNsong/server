@@ -110,6 +110,9 @@ exports.pinFlag = (req, res) => {
                     res.json({
                         nickname,
                         msg: "You got a flag!",
+                        logInfo: {
+                            device_info,
+                        },
                     });
                 })
                 .catch(handleError);
@@ -159,7 +162,6 @@ exports.isMatchUserSelf = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];
     const device_info = req.headers.device_info;
-    console.log(req.params);
     const { idx } = req.params;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
@@ -180,9 +182,6 @@ exports.isMatchUserSelf = (req, res) => {
                 .select('id_token')
                 .then((data) => {
                     const check = (data[0].id_token === id_token) ? true : false;
-                    console.log('dadta', data);
-                    console.log('check', check);
-
                     res.json({
                         check,
                         logInfo: {

@@ -59,7 +59,6 @@ exports.getMyInfo = (req, res) => {
         })
         .select()
         .then((user) => {
-            console.log(user);
             res.json({
                 user: user[0],
                 logInfo: {
@@ -126,7 +125,7 @@ exports.getUserInfo = (req, res) => {
     const {
         idx
     } = req.params;
-    console.log(idx);
+    
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();

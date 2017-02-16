@@ -1,7 +1,3 @@
-swagger: '2.0'
-info:
-  version: "1.0"
-  title: Authentication
 paths:
   /auth/wiki/sign-up:
     post:
@@ -85,8 +81,13 @@ paths:
               title:
               type: object
               properties:
-                check:
-                  type: boolean
+                data:
+                  type: object
+                  properties:
+                    check:
+                      type: boolean
+                    id_token:
+                      type: string
                 msg:
                   type: string
 
@@ -245,9 +246,3 @@ paths:
                   type: string
                 msg:
                   type: string
-
-host: virtserver.swaggerhub.com
-schemes:
- - https
- - http
-basePath: /sshirimp/AUTH/1.0

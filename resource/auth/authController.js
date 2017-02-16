@@ -101,7 +101,6 @@ exports.signIn = (req, res) => {
                 if (check) return resolve(user_id);
                 insertUserInfo(user_id)
                 .then(() => {
-                    console.log('1', user_id);
                     resolve();
                 });
             });
@@ -110,9 +109,14 @@ exports.signIn = (req, res) => {
     .then(() => tokenUpdate(user_id, service_issuer, secret, id_token))
     .then((token) => checkNickname(user_id, token))
     .then((data) => {
+        const user_id = data.user_id;
         res.json({
             data,
-            msg: `check a boolean.`
+            msg: `${user_id}님이 ${device_info}로 로그인 하셨습니다.`,
+            logInfo: {
+                user_id,
+                device_info,
+            },
         });
     })
     .catch(handleError);
@@ -211,7 +215,9 @@ const checkNickname = (user_id, token) => {
         })
         .then((user) => {
             const check = user[0].nickname !== null;
+            const user_id = user[0].user_id;
             const data = {
+                user_id,
                 check,
                 token,
             };
@@ -267,7 +273,6 @@ exports.signOut = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];
     const device_info = req.headers.device_info;
-    const { user_id } = req.body;
 
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
@@ -278,15 +283,13 @@ exports.signOut = (req, res) => {
     .where({
         id_token,
     })
-    .select('id_token')
     .update({
         id_token: null,
     })
     .then(() => {
         res.json({
-            msg: `${service_issuer}, ${user_id}님이 ${device_info}로 로그아웃 하였습니다.`,
+            msg: `${service_issuer}, ${device_info}로 로그아웃 하였습니다.`,
             logInfo: {
-                user_id,
                 date: config.date,
                 device_info,
             },
@@ -299,6 +302,39 @@ exports.signOut = (req, res) => {
     });
 };
 
+/*========================================
+* GET        AUTO SIGN-IN
+========================================*/
+exports.autoSignIn = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers['x-access-token'];
+    const device_info = req.headers.device_info;
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+
+    knex('user')
+    .where({
+        id_token,
+    })
+    .then((user) => {
+        const user_id = user[0].user_id;
+        res.json({
+            check: true,
+            msg: `${user_id}님이 ${device_info}로 자동로그인 하셨습니다.`,
+            logInfo: {
+                user_id,
+                device_info,
+            },
+        });
+    });
+};
+
+
+/*========================================
+* GET        CHECK NICKNAME
+========================================*/
 exports.checkNickname = (req, res) => {
     const service_issuer = req.headers.service_issuer;
     const id_token = req.headers["x-access-token"];

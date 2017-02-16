@@ -18,6 +18,10 @@ userRouter.route('/me')
 .get(userController.getMyInfo)
 .delete(userController.deleteUser);
 
+userRouter.route('/me/state_message')
+.put(userController.updateStateMessage);
+
+
 userRouter.route('/:idx')
 .get(userController.getUserInfo);
 

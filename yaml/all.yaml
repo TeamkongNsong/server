@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: "1.0"
+  version: "1.1"
   title: Authentication
 paths:
 #=======================================#
@@ -95,8 +95,13 @@ paths:
               title:
               type: object
               properties:
-                check:
-                  type: boolean
+                data:
+                  type: object
+                  properties:
+                    check:
+                      type: boolean
+                    id_token:
+                      type: string
                 msg:
                   type: string
 
@@ -267,7 +272,6 @@ paths:
 #
 #=======================================#
 
-
   /users:
     get:
       tags:
@@ -304,7 +308,7 @@ paths:
             type: array
             items:
               title:
-              type: object
+              type: array
               properties:
                 users:
                   type: string
@@ -313,7 +317,6 @@ paths:
                   properties:
                     device_info:
                       type: string
-
         400:
           description: Invalid tag value
 
@@ -345,19 +348,6 @@ paths:
                     type: string
                   device_info:
                     type: string
-        items:
-            title:
-            type: object
-            properties:
-              headers:
-                type: object
-                properties:
-                  service_issueur:
-                    type: string
-                  id_token:
-                    type: string
-                  device_info:
-                    type: string
       responses:
         200:
           description: successful operation
@@ -375,7 +365,6 @@ paths:
                   properties:
                     device_info:
                       type: string
-
         400:
           description: Invalid tag value
 
@@ -411,7 +400,6 @@ paths:
                 properties:
                   user_id:
                     type: object
-
       responses:
         200:
           description: successful operation
@@ -431,7 +419,59 @@ paths:
                       type: string
                     device_info:
                       type: string
+        400:
+          description: Invalid tag value
 
+  /users/me/state_message:
+    get:
+      tags:
+      - updateStateMessage
+      summary: 내 정보 가져오기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: updateStateMessage
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: string
+                properties:
+                  state_message:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
         400:
           description: Invalid tag value
 
@@ -487,7 +527,6 @@ paths:
                       type: string
                     device_info:
                       type: string
-
         400:
           description: Invalid tag value
 
@@ -552,11 +591,10 @@ paths:
                   properties:
                     device_info:
                       type: string
-
         400:
           description: Invalid tag value
 
-  /matchuser_id/:user_id:
+  users/matchuser_id/:user_id:
     get:
       tags:
       - checkDuplicatedUserId
@@ -608,11 +646,10 @@ paths:
                       type: string
                     device_info:
                       type: string
-
         400:
           description: Invalid tag value
 
-  /matchuser_nickname/:nickname:
+  users/matchuser_nickname/:nickname:
     get:
       tags:
       - checkDuplicatedUserNickname
@@ -666,9 +703,9 @@ paths:
                       type: string
                     device_info:
                       type: string
-
         400:
           description: Invalid tag value
+
 
 #=======================================#
 #=======================================#

@@ -2,7 +2,6 @@ const knex = require('../../model/knex.js');
 const Hangul = require('hangul-js');
 const config = require('../../config.js');
 
-
 /*================================================
                       COMMON
 ================================================*/
@@ -111,6 +110,44 @@ exports.deleteUser = (req, res) => {
 };
 
 
+/*---------------users/me/state_message---------------*/
+
+/*
+ * UPDATE - 상태메세지 업데이트
+ */
+exports.updateStateMessage = (req, res) => {
+    const service_issuer = req.headers.service_issuer;
+    const id_token = req.headers['x-access-token'];
+    const device_info = req.headers.device_info;
+    const { state_message } = req.body;
+    console.log('id_token:', id_token);
+    console.log('state_message', state_message);
+
+    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
+    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
+    req.checkHeaders('device_info', 'device_info is required').notEmpty();
+    req.checkBody('state_message', 'state_message is required').notEmpty();
+
+    knex('user')
+    .where({
+        id_token,
+    })
+    .select('state_message')
+    .update({
+        state_message,
+    })
+    .then((data) => {
+        console.log('data', data);
+        res.json({
+            msg: `${state_message}`,
+            logInfo: {
+                device_info,
+            },
+        });
+    })
+    .catch(handleError);
+};
+
 /*================================================
                     ONE OTHER
 ================================================*/
@@ -125,7 +162,7 @@ exports.getUserInfo = (req, res) => {
     const {
         idx
     } = req.params;
-    
+
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();
@@ -162,7 +199,9 @@ exports.searchUser = (req, res) => {
     const {
         word
     } = req.params;
-
+    console.log('==================================');
+    console.log('word', word, req.params);
+    console.log('==================================');
     req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
     req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
     req.checkHeaders('device_info', 'device_info is required').notEmpty();

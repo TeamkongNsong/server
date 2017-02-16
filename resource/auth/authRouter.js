@@ -13,6 +13,9 @@ const authController = require('./authController');
 authRouter.route('/wiki/sign-up')
 .post(authController.signUpByWiki);
 
+authRouter.route('/wiki')
+.get(authController.autoSignIn);
+
 /*===========================================
                 COMMON
 ===========================================*/

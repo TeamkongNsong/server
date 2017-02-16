@@ -148,13 +148,13 @@ paths:
                       type: strng
 
   /auth/sign-out:
-    post:
+    put:
       description: |
         common sign-out.
       parameters:
         -
           name: sign-out
-          in: body, headers
+          in: headers
           description: user_id
           required: true
       parameters:
@@ -175,11 +175,6 @@ paths:
                   id_token:
                     type: string
                   device_info:
-                    type: string
-              headers:
-                type: object
-                properties:
-                  user_id:
                     type: string
       responses:
         200:
@@ -204,7 +199,7 @@ paths:
                       type: strng
 
   /auth/check/nickname:
-    post:
+    get:
       description: |
         common check nickname
       parameters:

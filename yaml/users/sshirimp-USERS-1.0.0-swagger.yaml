@@ -35,7 +35,7 @@
             type: array
             items:
               title:
-              type: object
+              type: array
               properties:
                 users:
                   type: string

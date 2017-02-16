@@ -108,10 +108,10 @@ exports.signIn = (req, res) => {
         }
     })
     .then(() => tokenUpdate(user_id, service_issuer, secret, id_token))
-    .then(() => checkNickname(user_id))
-    .then((check) => {
+    .then((token) => checkNickname(user_id, token))
+    .then((data) => {
         res.json({
-            check,
+            data,
             msg: `check a boolean.`
         });
     })
@@ -195,12 +195,15 @@ const tokenUpdate = (user_id, service_issuer, secret, id_token) => {
         .update({
             id_token: token,
         })
+        .then(() => {
+            return token;
+        })
         .catch(handleError);
     })
     .catch(handleError);
 };
 
-const checkNickname = (user_id) => {
+const checkNickname = (user_id, token) => {
     return new Promise((resolve, reject) => {
         knex('user')
         .where({
@@ -208,7 +211,11 @@ const checkNickname = (user_id) => {
         })
         .then((user) => {
             const check = user[0].nickname !== null;
-            resolve(check);
+            const data = {
+                check,
+                token,
+            };
+            resolve(data);
         })
         .catch(handleError);
     });

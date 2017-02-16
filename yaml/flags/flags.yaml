@@ -1,0 +1,273 @@
+  /flags:
+    get:
+      tags:
+      - getAllFlags
+      summary: 모든 깃발 가져오기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: getAllFlags
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title: flags
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                flags:
+                  type: object
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    delete:
+      tags:
+      - deleteAllFlags
+      summary: 모든 깃발 삭제.
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: deleteAllFlags
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title: delete
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+  /flags/me:
+    post:
+      tags:
+      - pinFlag
+      summary: 깃발 박기
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  message:
+                    type: string
+                  region:
+                    type: object
+                    properties:
+                      latitude:
+                        type: string
+                      longitude:
+                        type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    delete:
+      tags:
+      - deleteMapFlag
+      summary: 깃발 삭제
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: deleteMapFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  idx:
+                    type: boolean
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+  /flags/check/:idx:
+    get:
+      tags:
+      - isMatchUserSelf
+      summary: 깃발이 내껀지 아닌지.
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: isMatchUserSelf
+        in: headers params
+        description: null
+        required: true
+        type: array
+        items:
+          title:
+          type: object
+          properties:
+            headers:
+              type: object
+              properties:
+                service_issueur:
+                  type: string
+                id_token:
+                  type: string
+                device_info:
+                  type: string
+            params:
+              type: object
+              properties:
+                idx:
+                  type: boolean
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                check:
+                  type: boolean
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true

@@ -1,0 +1,253 @@
+swagger: '2.0'
+info:
+  version: "1.0"
+  title: Authentication
+paths:
+  /auth/wiki/sign-up:
+    post:
+      description: |
+        sign-up with wiki.
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              body:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  password:
+                    type: string
+                  password2:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+
+  /auth/sign-in:
+    post:
+      description: |
+        sign-in.
+      parameters:
+        -
+          name: sign-in
+          in: body, headers
+          description: user_id, password
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  password:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                check:
+                  type: boolean
+                msg:
+                  type: string
+
+  /auth/nickname:
+    put:
+      description: |
+        enroll nickname.
+      parameters:
+        -
+          name: nickname
+          in: body, headers
+          description: nickname,
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              headers:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    nickname:
+                      type: string
+                    created_at:
+                      type: string
+                    device_info:
+                      type: strng
+
+  /auth/sign-out:
+    post:
+      description: |
+        common sign-out.
+      parameters:
+        -
+          name: sign-out
+          in: body, headers
+          description: user_id
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              headers:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+                    date:
+                      type: string
+                    device_info:
+                      type: strng
+
+  /auth/check/nickname:
+    post:
+      description: |
+        common check nickname
+      parameters:
+        -
+          name: check nickname
+          in: headers
+          description: get a boolean!
+          required: true
+      parameters:
+      - name: pinFlag
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title:
+            type: object
+            properties:
+              title:
+              type: object
+              properties:
+                check:
+                  type: string
+                msg:
+                  type: string
+
+host: virtserver.swaggerhub.com
+schemes:
+ - https
+ - http
+basePath: /sshirimp/AUTH/1.0

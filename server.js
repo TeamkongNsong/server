@@ -75,5 +75,7 @@ app.get('/', (req, res) => {
     res.send('wikius server 실행');
 });
 app.listen(3333, () => {
-    console.log(`Example app listening on port, 3333!`);
+    console.log('================================');
+    console.log(' WELCOME TO WIKIUS SERVER, 3333');
+    console.log('================================');
 });

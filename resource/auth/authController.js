@@ -142,6 +142,7 @@ exports.signIn = (req, res) => {
                                     resolve();
                                 });
                         });
+
                 } else {
                     return res.json({
                         msg: 'check err',
@@ -206,10 +207,8 @@ const hasAlreadyUser = (user_id) => {
         })
         .then((user) => {
             const check = user.length > 0;
-            if (!check) return Promise.reject('hasAlreadyUser err');
             return check;
-        })
-        .catch(handleError);
+        });
 };
 
 const insertUserInfo = (user_id) => {
@@ -217,11 +216,7 @@ const insertUserInfo = (user_id) => {
         .insert({
             user_id,
             email: user_id,
-        })
-        .then((resuslt) => {
-            if (!result) return Promise.reject('insertUserInfo ERR');
-        })
-        .catch(handleError);
+        });
 };
 
 

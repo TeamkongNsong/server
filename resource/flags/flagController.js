@@ -45,6 +45,7 @@ const handleValidation = (req, res, keyValues, locatedIn) => {
             err: err.message,
             statusCode: 400,
         });
+        return false;
     }
     return true;
 };
@@ -118,7 +119,7 @@ exports.deleteAllFlags = (req, res) => {
 exports.pinFlag = (req, res) => {
     const { service_issuer, device_info } = req.headers;
     const id_token = req.headers['x-access-token'];
-    const { title, message } = req.body;
+    const { title, message, region } = req.body;
     const { latitude, longitude } = req.body.region;
     const headers = {
         service_issuer,
@@ -128,9 +129,9 @@ exports.pinFlag = (req, res) => {
     const body = {
         title,
         message,
-        latitude,
-        longitude,
+        region,
     };
+
 
     if ((handleValidation(req, res, headers, 'headers')) && (handleValidation(req, res, body, 'body'))) {
         knex('user')
@@ -148,7 +149,7 @@ exports.pinFlag = (req, res) => {
                         message,
                         latitude,
                         longitude,
-                        created_at: config.date,
+                        created_at: config.dateNow(),
                     })
                     .then((result) => {
                         if (!result) return Promise.reject('pinFlag ERR');
@@ -157,6 +158,7 @@ exports.pinFlag = (req, res) => {
                             msg: "You got a flag!",
                             logInfo: {
                                 device_info,
+                                date: config.dateNow(),
                             },
                         });
                     });

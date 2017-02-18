@@ -1,11 +1,56 @@
 const knex = require('../../model/knex.js');
 const config = require('../../config.js');
 
-/*================================================
-                      COMMON
-================================================*/
+/*===========================================
+/*===========================================
+/*===========================================
+                   COMMON
+/*===========================================
+/*===========================================
+*===========================================*/
+const handleValidation = (req, res, keyValues, locatedIn) => {
+    if (locatedIn === 'headers') {
+        const headers = keyValues;
+        for (let key in headers) {
+            if (key === 'id_token') {
+                key = 'x-access-token';
+            }
+            req.checkHeaders(`${key}`, `${key} is required`).notEmpty();
+        }
+    } else if (locatedIn === 'params') {
+        const params = keyValues;
+        for (let key in params) {
+            req.checkParams(`${key}`, `${key} is required`).notEmpty();
+        }
+    } else if (locatedIn === 'body') {
+        const body = keyValues;
+        for (let key in body) {
+            if (key === body.password2) {
+                req.checkBody(`${key}`, `${key} is required`).equal(body.password);
+            }
+            req.checkBody(`${key}`, `${key} is required`).notEmpty();
+        }
+    } else if (locatedIn === 'query') {
+        const query = keyValues;
+        for (let key in query) {
+            req.checkQuery(`${key}`, `${key} is required`).notEmpty();
+        }
+    }
+
+    const err = req.validationErrors();
+    if (err) {
+        handleError(err);
+        res.status(400).json({
+            msg: 'validation errors!',
+            err: err.message,
+            statusCode: 400,
+        });
+    }
+    return true;
+};
+
 const handleError = (err) => {
-    console.log(err);
+    console.log('err', err);
 };
 
 
@@ -16,24 +61,25 @@ const handleError = (err) => {
  * GET - get all flags
  */
 exports.getAllFlags = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
-
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-
-    knex("user_flag")
-        .then((flags) => {
-            res.json({
-                flags,
-                logInfo: {
-                    device_info,
-                },
-            });
-        })
-        .catch(handleError);
+    const { service_issuer, device_info } = req.headers;
+    const id_token = req.headers['x-access-token'];
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    if (handleValidation(req, res, headers, 'headers')) {
+        knex("user_flag")
+            .then((flags) => {
+                res.json({
+                    flags,
+                    logInfo: {
+                        device_info,
+                    },
+                });
+            })
+            .catch(handleError);
+    }
 };
 
 /*
@@ -50,7 +96,8 @@ exports.deleteAllFlags = (req, res) => {
 
     knex('user_flag')
         .del()
-        .then(() => {
+        .then((result) => {
+            if(!result) return Promise.reject('deleteAllFlags ERR');
             res.json({
                 msg: "deleted all flags succesfully!",
                 logInfo: {
@@ -69,85 +116,88 @@ exports.deleteAllFlags = (req, res) => {
  * POST
  */
 exports.pinFlag = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
-    const {
+    const { service_issuer, device_info } = req.headers;
+    const id_token = req.headers['x-access-token'];
+    const { title, message } = req.body;
+    const { latitude, longitude } = req.body.region;
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    const body = {
         title,
         message,
-    } = req.body;
-    const {
         latitude,
         longitude,
-    } = req.body.region;
+    };
 
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkBody('title', 'title is required').notEmpty();
-    req.checkBody('message', 'message is required').notEmpty();
-    req.checkBody('latitude', 'latitude is required').notEmpty();
-    req.checkBody('longitude', 'longitude is required').notEmpty();
-
-    knex('user')
-        .where({
-            id_token,
-        })
-        .then((data) => {
-            const idx = data[0].idx;
-            const nickname = data[0].nickname;
-            knex('user_flag')
-                .insert({
-                    user_idx: idx,
-                    nickname,
-                    title,
-                    message,
-                    latitude,
-                    longitude,
-                    created_at: config.date,
-                })
-                .then((data) => {
-                    res.json({
+    if ((handleValidation(req, res, headers, 'headers')) && (handleValidation(req, res, body, 'body'))) {
+        knex('user')
+            .where({
+                id_token,
+            })
+            .then((data) => {
+                const idx = data[0].idx;
+                const nickname = data[0].nickname;
+                return knex('user_flag')
+                    .insert({
+                        user_idx: idx,
                         nickname,
-                        msg: "You got a flag!",
-                        logInfo: {
-                            device_info,
-                        },
+                        title,
+                        message,
+                        latitude,
+                        longitude,
+                        created_at: config.date,
+                    })
+                    .then((result) => {
+                        if (!result) return Promise.reject('pinFlag ERR');
+                        res.json({
+                            nickname,
+                            msg: "You got a flag!",
+                            logInfo: {
+                                device_info,
+                            },
+                        });
                     });
-                })
-                .catch(handleError);
-        })
-        .catch(handleError);
+            })
+            .catch(handleError);
+    }
 };
 
 /*
  * DELETE
  */
 exports.deleteMapFlag = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
+    const { service_issuer, device_info } = req.headers;
     const id_token = req.headers['x-access-token'];
-    const device_info = req.headers.device_info;
     const { idx } = req.body;
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    const body = {
+        idx,
+    };
 
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkBody('idx', 'idx is required').notEmpty();
-
-    knex('user_flag')
-        .where({
-            idx,
-        })
-        .del()
-        .then(() => {
-            res.json({
-                msg: "deleted message succesfully!",
-                logInfo: {
-                    device_info,
-                },
-            });
-        })
-        .catch(handleError);
+    if ((handleValidation(req, res, headers, 'headers')) && (handleValidation(req, res, body, 'body'))) {
+        knex('user_flag')
+            .where({
+                idx,
+            })
+            .del()
+            .then((result) => {
+                if (!result) return Promise.reject('deleteMapFlag ERR');
+                res.json({
+                    msg: "deleted message succesfully!",
+                    logInfo: {
+                        device_info,
+                    },
+                });
+            })
+            .catch(handleError);
+    }
 };
 
 
@@ -159,37 +209,41 @@ exports.deleteMapFlag = (req, res) => {
  * GET: 깃발 누른 사람과 닉네임이 매치하는 지 true, false로 응답
  */
 exports.isMatchUserSelf = (req, res) => {
-    const service_issuer = req.headers.service_issuer;
-    const id_token = req.headers["x-access-token"];
-    const device_info = req.headers.device_info;
+    const { service_issuer, device_info } = req.headers;
+    const id_token = req.headers['x-access-token'];
     const { idx } = req.params;
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    const params = {
+        idx,
+    };
 
-    req.checkHeaders('service_issuer', 'service_issuer is required').notEmpty();
-    req.checkHeaders('x-access-token', 'x-access-token is required').notEmpty();
-    req.checkHeaders('device_info', 'device_info is required').notEmpty();
-    req.checkParams('idx', 'idx is required').notEmpty();
-
-    knex('user_flag')
-        .where({
-            idx,
-        })
-        .then((flag) => {
-            const nickname = flag[0].nickname;
-            knex('user')
-                .where({
-                    nickname,
-                })
-                .select('id_token')
-                .then((data) => {
-                    const check = (data[0].id_token === id_token) ? true : false;
-                    res.json({
-                        check,
-                        logInfo: {
-                            device_info,
-                        },
+    if ((handleValidation(req, res, headers, 'headers')) && (handleValidation(req, res, params, 'params'))) {
+        knex('user_flag')
+            .where({
+                idx,
+            })
+            .then((flag) => {
+                const nickname = flag[0].nickname;
+                return knex('user')
+                    .where({
+                        nickname,
+                    })
+                    .select('id_token')
+                    .then((data) => {
+                        if (!data.length) return Promise.reject('isMatchUserSelf ERR');
+                        const check = (data[0].id_token === id_token) ? true : false;
+                        res.json({
+                            check,
+                            logInfo: {
+                                device_info,
+                            },
+                        });
                     });
-                })
-                .catch(handleError);
-        })
-        .catch(handleError);
+            })
+            .catch(handleError);
+    }
 };

@@ -393,7 +393,9 @@ exports.checkNickname = (req, res) => {
         id_token,
         device_info,
     };
-
+    console.log('==================================');
+    console.log('h3', headers);
+    console.log('==================================');
     if (handleValidation(req, res, headers, 'headers')) {
         knex('user')
             .where({

@@ -8,5 +8,8 @@ exports.info = {
     'database': 'yoongoodb'
 };
 
-exports.date = new Date();
-exports.date.setHours(exports.date.getHours() + 9);
+exports.dateNow = () => {
+    const date = new Date();
+    date.setHours(date.getHours() + 9);
+    return date;
+};

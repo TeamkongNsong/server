@@ -296,7 +296,7 @@ exports.enrollNickname = (req, res) => {
             .update({
                 nickname,
                 device_info,
-                created_at: config.date,
+                created_at: config.dateNow()
             })
             .then((result) => {
                 if (!result) return Promise.reject('enrollNickname err');
@@ -305,7 +305,7 @@ exports.enrollNickname = (req, res) => {
                     logInfo: {
                         nickname,
                         device_info,
-                        created_at: config.date,
+                        created_at: config.dateNow()
                     },
                 });
             })
@@ -339,7 +339,7 @@ exports.signOut = (req, res) => {
                 res.json({
                     msg: `${service_issuer}, ${device_info}로 로그아웃 하였습니다.`,
                     logInfo: {
-                        date: config.date,
+                        date: config.dateNow(),
                         device_info,
                     },
                 });

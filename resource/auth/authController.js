@@ -401,7 +401,7 @@ exports.checkNickname = (req, res) => {
             })
             .then((data) => {
                 const check = data[0].nickname !== null;
-                if (!check) return Promise.reject('checkNickname ERR');
+                if (!check) Promise.reject('checkNickname ERR');
                 res.json({
                     check,
                     msg: `check a boolean.`

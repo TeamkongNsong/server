@@ -401,12 +401,10 @@ exports.checkNickname = (req, res) => {
             })
             .then((data) => {
                 const check = data[0].nickname !== null;
-                if (!check) Promise.reject('checkNickname ERR');
                 res.json({
                     check,
                     msg: `check a boolean.`
                 });
-            })
-            .catch(handleError);
+            });
     }
 };

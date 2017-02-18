@@ -14,7 +14,6 @@ flagRouter.route('/')
 .delete(flagController.deleteAllFlags);
 
 flagRouter.route('/me')
-.get(flagController.getMyFlags)
 .post(flagController.pinFlag)
 .delete(flagController.deleteMapFlag);
 

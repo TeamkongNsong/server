@@ -20,5 +20,5 @@ flagRouter.route('/me')
 flagRouter.route('/check/:idx')
 .get(flagController.isMatchUserSelf);
 
-
+ 
 module.exports = flagRouter;

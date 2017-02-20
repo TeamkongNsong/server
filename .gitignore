@@ -55,5 +55,8 @@ jspm_packages
 # dotenv environment variables file
 .env
 
+# untrack & ignore config.js
+config.js
+
 
 # End of https://www.gitignore.io/api/node

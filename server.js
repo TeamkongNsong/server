@@ -67,6 +67,10 @@ app.use('/users', userRouter);
 const flagRouter = require('./resource/flags/flagRouter');
 app.use('/flags', flagRouter);
 
+const friendRouter = require('./resource/friends/friendRouter');
+app.use('/friends', friendRouter);
+
+
 
 /*=========================================================
                 USE GET(test), listen server

@@ -19,9 +19,9 @@ const friendController = require('./friendController');
 ===========================================*/
 friendRouter.route('/me')
 .get(friendController.getMyFriends)
-.post(friendController.addFriend);
-// .put(friendController.statusFriend)
-// .delete(friendController.deleteFriend);
+.post(friendController.addFriend)
+.put(friendController.handleFriendStatus)
+.delete(friendController.deleteFriendStatus);
 
 
 module.exports = friendRouter;

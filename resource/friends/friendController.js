@@ -56,13 +56,13 @@ const handleValidation = (req, res, keyValues, locatedIn) => {
     return true;
 };
 
-const getMyIdx = (id_token) => {
+const getIdx = (id_token) => {
     return knex('user')
         .where({
             id_token,
         })
         .then((user) => {
-            if(!user) return Promise.reject('getMyIdx ERR');
+            if (!user) return Promise.reject('getIdx ERR');
             return user;
         })
         .catch(handleError);
@@ -72,43 +72,51 @@ const handleError = (err) => {
     console.log('err', err);
 };
 
-// exports.getAllFriends = (req, res) => {
-//     const { service_issuer, device_info } = req.headers;
-//     const id_token = req.headers['x-access-token'];
-//     const headers = {
-//         service_issuer,
-//         id_token,
-//         device_info,
-//     };
-//
-//     if (handleValidation(req, res, headers, 'headers')) {
-//         knex('friends')
-//             .then((friends) => {
-//                 if (!friends.length) Promise.reject('getAllFriends ERR');
-//                 res.json({
-//                     friends,
-//                     logInfo: {
-//                         device_info,
-//                     },
-//                 });
-//             })
-//             .catch(handleError);
-//     }
-// };
+const assignFromTo = (id_token, friend) => {
+    return knex('user')
+        .where({
+            id_token,
+        }).orWhere({
+            nickname: friend,
+        })
+        .then((users) => {
+            if (!users.length) Promise.reject('assignFromTo ERR');
+            let from,
+                to = null;
+            users.forEach((user) => {
+                if (user.id_token === id_token) {
+                    from = user.idx;
+                } else if (user.nickname === friend) {
+                    to = user.idx;
+                }
+            });
+            const them = {
+                from,
+                to,
+            };
+            return Promise.resolve(them);
+        })
+        .catch(handleError);
+};
 
+
+/*========================================
+* GET     GET MY FRIEND'S STATUS
+========================================*/
 exports.getMyFriends = (req, res) => {
-    const { service_issuer, device_info, status } = req.headers;
+    const {
+        service_issuer,
+        device_info
+    } = req.headers;
     const id_token = req.headers['x-access-token'];
     const headers = {
         service_issuer,
         id_token,
         device_info,
-        status,
     };
 
     if (handleValidation(req, res, headers, 'headers')) {
-        getMyIdx(id_token)
-        .then((user) => {
+        const getMyFriendsData = (user) => {
             return knex('friend')
                 .where({
                     from: user[0].idx,
@@ -116,11 +124,7 @@ exports.getMyFriends = (req, res) => {
                     to: user[0].idx,
                 })
                 .then((friendsInfo) => {
-
-                    console.log('==================================');
-                    console.log('f', friendsInfo);
-                    console.log('==================================');
-                    if(!friendsInfo.length) return Promise.reject('getMyFriends ERR');
+                    if (!friendsInfo.length) return Promise.reject('getMyFriends ERR');
                     res.json({
                         friendsInfo,
                         logInfo: {
@@ -128,19 +132,27 @@ exports.getMyFriends = (req, res) => {
                         },
                     });
                 });
-        })
-        .catch(handleError);
+        };
+
+        getIdx(id_token)
+            .then(getMyFriendsData)
+            .catch(handleError);
     }
 };
 
-
-
-
+/*========================================
+* POST         ADD FRINED
+========================================*/
 
 exports.addFriend = (req, res) => {
-    const { service_issuer, device_info } = req.headers;
+    const {
+        service_issuer,
+        device_info
+    } = req.headers;
     const id_token = req.headers['x-access-token'];
-    const { friend } = req.body;
+    const {
+        friend
+    } = req.body;
     const headers = {
         service_issuer,
         id_token,
@@ -151,78 +163,143 @@ exports.addFriend = (req, res) => {
     };
 
     if (handleValidation(req, res, headers, 'headers') &&
-    handleValidation(req, res, body, 'body')) {
-        const assignFromTo = (id_token, friend) => {
-            return knex('user')
-                .where({
-                    id_token,
-                }).orWhere({
-                    nickname: friend,
-                })
-                .then((users) => {
-                    if(!users.length) Promise.reject('checkStatus ERR');
-                    let from,
-                        to = null;
-                    users.forEach((user) => {
-                        if (user.id_token === id_token) {
-                            from = user.idx;
-                        } else if (user.nickname === friend) {
-                            to = user.idx;
-                        }
-                    });
-                    const them = {
-                        from,
-                        to,
-                    };
-                    return Promise.resolve(them);
-                })
-                .catch(handleError);
-        };
+        handleValidation(req, res, body, 'body')) {
 
-        const checkStatus = (them) => {
+        const insertFriend = (them) => {
             return knex('friend')
                 .where({
                     from: them.from,
                     to: them.to,
                 })
-                .then((statusInfo) => {
-                    them = {
-                        from: them.from,
-                        to: them.to,
-                        status: statusInfo,
-                    };
-                    return them;
+                .select('status')
+                .then((status) => {
+                    if (!status.length) {
+                        knex('friend')
+                            .insert({
+                                from: them.from,
+                                to: them.to,
+                                status: 0,
+                            })
+                            .then((result) => {
+                                if (!result) return Promise.reject('insertFriend ERR');
+                                res.json({
+                                    msg: 'insert friend request succesfully.',
+                                    logInfo: {
+                                        device_info,
+                                    },
+                                });
+                            })
+                            .catch(handleError);
+                    } else {
+                        res.json({
+                            msg: 'you already got a request.',
+                            logInfo: {
+                                device_info,
+                            },
+                        });
+                    }
+                });
+        };
+        assignFromTo(id_token, friend)
+            .then(insertFriend);
+    }
+};
+
+/*========================================
+* PUT        FRINEDS'S STATUS
+========================================*/
+exports.handleFriendStatus = (req, res) => {
+    const {
+        service_issuer,
+        device_info
+    } = req.headers;
+    const id_token = req.headers['x-access-token'];
+    const {
+        friend,
+        status
+    } = req.body;
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    const body = {
+        friend,
+        status,
+    };
+
+    if ((handleValidation(req, res, headers, 'headers')) &&
+        (handleValidation(req, res, body, 'body'))) {
+        const updateFriendStatuts = (them) => {
+            return knex('friend')
+                .where({
+                    from: them.from,
+                    to: them.to,
+                })
+                .then((friendsInfo) => {
+                    return knex('friend')
+                        .update({
+                            status,
+                        })
+                        .then((result) => {
+                            if (!result) return Promise.reject('updateFriendStatuts ERR');
+                            res.json({
+                                logInfo: {
+                                    friendsInfo,
+                                    msg: 'status updated successfully!',
+                                    device_info,
+                                },
+                            });
+                        });
                 });
         };
 
-        const addStatus = (them) => {
-            if (!them.status.length) {
-                knex('friend')
-                .insert({
+        assignFromTo(id_token, friend)
+            .then(updateFriendStatuts)
+            .catch(handleError);
+    }
+};
+
+exports.deleteFriendStatus = (req, res) => {
+    const {
+        service_issuer,
+        device_info
+    } = req.headers;
+    const id_token = req.headers['x-access-token'];
+    const {
+        friend
+    } = req.body;
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    const body = {
+        friend,
+    };
+
+    if ((handleValidation(req, res, headers, 'headers')) &&
+        (handleValidation(req, res, body, 'body'))) {
+        const deleteFrinedStatus = (them) => {
+            return knex('friend')
+                .where({
                     from: them.from,
                     to: them.to,
-                    status: 0,
                 })
+                .del()
                 .then((result) => {
-                    if (!result) Promise.reject('친구추가 ERR');
+                    if (!result) return Promise.reject('deleteFrinedStatus ERR');
                     res.json({
                         logInfo: {
+                            msg: 'deleted successfully!',
                             device_info,
                         },
                     });
-                })
-                .catch(handleError);
-            }
-            res.json({
-                status: them.status,
-                logInfo: {
-                    device_info,
-                },
-            });
+                });
         };
 
         assignFromTo(id_token, friend)
-        .then(checkStatus)
-        .then(addStatus);
+            .then(deleteFrinedStatus)
+            .catch(handleError);
     }
 };

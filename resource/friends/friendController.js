@@ -124,7 +124,6 @@ exports.getMyFriends = (req, res) => {
                     to: user[0].idx,
                 })
                 .then((friendsInfo) => {
-                    if (!friendsInfo.length) return Promise.reject('getMyFriends ERR');
                     res.json({
                         friendsInfo,
                         logInfo: {
@@ -135,8 +134,7 @@ exports.getMyFriends = (req, res) => {
         };
 
         getIdx(id_token)
-            .then(getMyFriendsData)
-            .catch(handleError);
+            .then(getMyFriendsData);
     }
 };
 

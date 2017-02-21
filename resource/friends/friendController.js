@@ -100,7 +100,7 @@ const assignFromTo = (id_token, friend) => {
 
 
 /*========================================
-* GET     GET MY FRIEND'S STATUS
+* GET     GET MY FRIENDS STATUS
 ========================================*/
 exports.getMyFriends = (req, res) => {
     const {
@@ -160,7 +160,6 @@ exports.addFriend = (req, res) => {
 
     if (handleValidation(req, res, headers, 'headers') &&
         handleValidation(req, res, body, 'body')) {
-
         const insertFriend = (them) => {
             return knex('friend')
                 .where({
@@ -240,8 +239,8 @@ exports.handleFriendStatus = (req, res) => {
                         .then((result) => {
                             if (!result) return Promise.reject('updateFriendStatuts ERR');
                             res.json({
+                                msg: 'status updated successfully!',
                                 logInfo: {
-                                    msg: 'status updated successfully!',
                                     device_info,
                                 },
                             });
@@ -304,9 +303,14 @@ exports.deleteFriendStatus = (req, res) => {
 * GET           IS MY FRINED
 ========================================*/
 exports.isMyFriend = (req, res) => {
-    const { service_issuer, device_info } = req.headers;
+    const {
+        service_issuer,
+        device_info
+    } = req.headers;
     const id_token = req.headers['x-access-token'];
-    const { friend } = req.params;
+    const {
+        friend
+    } = req.params;
     const headers = {
         service_issuer,
         id_token,
@@ -317,23 +321,23 @@ exports.isMyFriend = (req, res) => {
     };
 
     if ((handleValidation(req, res, headers, 'headers')) &&
-    (handleValidation(req, res, params, 'params'))) {
+        (handleValidation(req, res, params, 'params'))) {
         const checkStatus = (them) => {
             return knex('friend')
-            .where({
-                from: them.from,
-                to: them.to,
-            })
-            .select('status')
-            .then((status) => {
-                const sendStatus = status.length === 0 ? 10 : status[0].status;
-                res.json({
-                    status: sendStatus,
-                    logInfo: {
-                        device_info,
-                    },
+                .where({
+                    from: them.from,
+                    to: them.to,
+                })
+                .select('status')
+                .then((status) => {
+                    const sendStatus = status.length === 0 ? 10 : status[0].status;
+                    res.json({
+                        status: sendStatus,
+                        logInfo: {
+                            device_info,
+                        },
+                    });
                 });
-            });
         };
         assignFromTo(id_token, friend)
             .then(checkStatus)

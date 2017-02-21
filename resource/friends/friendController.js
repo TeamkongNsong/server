@@ -326,10 +326,9 @@ exports.isMyFriend = (req, res) => {
             })
             .select('status')
             .then((status) => {
-                if (!status.length) return Promise.reject('checkStatus ERR!');
-                status = status[0].status;
+                const sendStatus = status.length === 0 ? status : status[0].status;
                 res.json({
-                    status,
+                    status: sendStatus,
                     logInfo: {
                         device_info,
                     },

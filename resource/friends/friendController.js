@@ -326,7 +326,7 @@ exports.isMyFriend = (req, res) => {
             })
             .select('status')
             .then((status) => {
-                const sendStatus = status.length === 0 ? status : status[0].status;
+                const sendStatus = status.length === 0 ? 10 : status[0].status;
                 res.json({
                     status: sendStatus,
                     logInfo: {

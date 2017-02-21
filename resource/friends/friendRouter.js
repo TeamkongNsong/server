@@ -23,5 +23,7 @@ friendRouter.route('/me')
 .put(friendController.handleFriendStatus)
 .delete(friendController.deleteFriendStatus);
 
+friendRouter.route('/me/:friend')
+.get(friendController.isMyFriend);
 
 module.exports = friendRouter;

@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: "1.1"
+  version: "1.2"
   title: Authentication
 paths:
 #=======================================#
@@ -989,6 +989,285 @@ paths:
         400:
           description: Invalid tag value
       deprecated: true
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+#=======================================#
+
+#=======================================#
+#
+#                FRIENDS
+#
+#=======================================#
+  /friends/me:
+    get:
+      tags:
+      - getMyFriends
+      summary: GET MY FRIENDS STATUS
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: getMyFriends
+        in: headers
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title: flags
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                friendsInfo:
+                  type: object
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    post:
+      tags:
+      - addFriend
+      summary: ADD FRINED
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: addFriend
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  friend:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title: delete
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    put:
+      tags:
+      - handleFriendStatus
+      summary: FRINEDS'S STATUS
+      description: description
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: handleFriendStatus
+        in: headers body
+        description: null
+        required: true
+        type: array
+        items:
+            title:
+            type: object
+            properties:
+              headers:
+                type: object
+                properties:
+                  service_issueur:
+                    type: string
+                  id_token:
+                    type: string
+                  device_info:
+                    type: string
+              body:
+                type: object
+                properties:
+                  friend:
+                    type: string
+                  status:
+                    type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            title:
+            type: array
+            items:
+              title:
+              type: object
+              properties:
+                msg:
+                  type: string
+                logInfo:
+                  type: object
+                  properties:
+                    device_info:
+                      type: string
+
+        400:
+          description: Invalid tag value
+      deprecated: true
+
+    delete:
+       tags:
+       - deleteFriendStatus
+       summary: 친구 삭제 & 요청 취소
+       description: description
+       produces:
+       - application/json
+       - application/xml
+       parameters:
+       - name: deleteFriendStatus
+         in: headers body
+         description: null
+         required: true
+         type: array
+         items:
+             title:
+             type: object
+             properties:
+               headers:
+                 type: object
+                 properties:
+                   service_issueur:
+                     type: string
+                   id_token:
+                     type: string
+                   device_info:
+                     type: string
+               body:
+                 type: object
+                 properties:
+                   friened:
+                     type: string
+       responses:
+         200:
+           description: successful  operation
+           schema:
+             title:
+             type: array
+             items:
+               title:
+               type: object
+               properties:
+                 msg:
+                   type: string
+                 logInfo:
+                   type: object
+                   properties:
+                     device_info:
+                       type: string
+
+         400:
+           description: Invalid tag value
+       deprecated: true
+
+  /friend/me/:friend:
+     get:
+       tags:
+       - isMyFriend
+       summary: 이 친구랑 나의 status확인
+       description: description
+       produces:
+       - application/json
+       - application/xml
+       parameters:
+       - name: isMyFriend
+         in: headers params
+         description: null
+         required: true
+         type: array
+         items:
+           title:
+           type: object
+           properties:
+             headers:
+               type: object
+               properties:
+                 service_issueur:
+                   type: string
+                 id_token:
+                   type: string
+                 device_info:
+                   type: string
+             params:
+               type: object
+               properties:
+                 friend:
+                   type: string
+       responses:
+         200:
+           description: successful  operation
+           schema:
+             title:
+             type: array
+             items:
+               title:
+               type: object
+               properties:
+                 status:
+                   type: number
+                 logInfo:
+                   type: object
+                   properties:
+                     device_info:
+                       type: string
+
+         400:
+           description: Invalid tag value
+       deprecated: true
 
 host: virtserver.swaggerhub.com
 schemes:

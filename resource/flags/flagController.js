@@ -50,8 +50,9 @@ const handleValidation = (req, res, keyValues, locatedIn) => {
     return true;
 };
 
-const handleError = (err) => {
+const handleError = (err, res) => {
     console.log('err', err);
+    res.end();
 };
 
 
@@ -229,6 +230,7 @@ exports.isMatchUserSelf = (req, res) => {
                 idx,
             })
             .then((flag) => {
+                if (!flag.length) return Promise.reject('isMatchUserSelf ERR');
                 const nickname = flag[0].nickname;
                 return knex('user')
                     .where({
@@ -246,6 +248,6 @@ exports.isMatchUserSelf = (req, res) => {
                         });
                     });
             })
-            .catch(handleError);
+            .catch((err) => handleError(err, res));
     }
 };

@@ -516,7 +516,7 @@ paths:
               type: object
               properties:
                 user:
-                  type: string
+                  type: array
                 logInfo:
                   type: object
                   properties:

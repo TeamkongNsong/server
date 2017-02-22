@@ -80,6 +80,7 @@ const assignFromTo = (id_token, friend) => {
             nickname: friend,
         })
         .then((users) => {
+            console.log('users',users)
             if (!users.length) return Promise.reject('assignFromTo ERR');
             let from,
                 to = null;
@@ -323,16 +324,16 @@ exports.isMyFriend = (req, res) => {
     if ((handleValidation(req, res, headers, 'headers')) &&
         (handleValidation(req, res, params, 'params'))) {
         const checkStatus = (them) => {
+            console.log('them', them);
             return knex('friend')
                 .where({
                     from: them.from,
                     to: them.to,
                 })
-                .select('status')
-                .then((status) => {
-                    const sendStatus = status.length === 0 ? 10 : status[0].status;
+                .then((friendsInfo) => {
+                    const sendStatus = friendsInfo.length === 0 ? 10 : friendsInfo[0].status;
                     res.json({
-                        status: sendStatus,
+                        friendsInfo,
                         logInfo: {
                             device_info,
                         },

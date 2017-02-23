@@ -142,7 +142,7 @@ exports.getAllProfileImages = (req, res) => {
                     const urls = [];
                     bucketContents.forEach((content) => {
                         if (content.Key.indexOf(`${idx}/profile`) !== -1) {
-                            urls.push({
+                            urls.unshift({
                                 url: `https://s3.ap-northeast-2.amazonaws.com/${bucket.name}/${content.Key}`,
                             });
                         }

@@ -11,61 +11,6 @@ const formidable = require('formidable');
 const config = require('../../config.js');
 const bucket = require('../../config.js').profileBucket;
 
-exports.getAllProfileImages = (req, res) => {
-    const {
-        service_issuer,
-        device_info
-    } = req.headers;
-    const id_token = req.headers['x-access-token'];
-    const headers = {
-        service_issuer,
-        id_token,
-        device_info,
-    };
-    if (handleValidation(req, res, headers, 'headers')) {
-        knex('user')
-            .where({
-                id_token
-            })
-            .select('idx')
-            .then((data) => {
-                if (!data.length) return Promise.reject('no idx');
-                const idx = data[0].idx;
-                const params = {
-                    Bucket: bucket.name,
-                };
-                s3.listObjects(params, (err, data) => {
-                    if (err) {
-                        console.log('err', err);
-                        return Promise.reject('getAllProfileImages ERR');
-                    }
-                    const bucketContents = data.Contents;
-                    const urls = [];
-                    bucketContents.forEach((content) => {
-                        if (content.Key.indexOf(`${idx}/profile`) !== -1) {
-                            urls.push({
-                                url: `https://s3.ap-northeast-2.amazonaws.com/${bucket.name}/${content.key}`,
-                            });
-                        }
-                    });
-                    res.json({
-                        urls,
-                        logInfo: {
-                            device_info,
-                        },
-                    });
-                });
-
-            })
-            .catch(handleError);
-        //     s3.getSignedUrl('getObject', urlParams, (err, url) => {
-        //         if (err) console.log(err);
-        //         userUrls.push(url);
-        //     });
-        // }
-    }
-};
-
 /*===========================================
 /*===========================================
 /*===========================================
@@ -162,5 +107,60 @@ exports.saveImage = (req, res) => {
                 handleError(err);
                 res.end();
             });
+    }
+};
+
+exports.getAllProfileImages = (req, res) => {
+    const {
+        service_issuer,
+        device_info
+    } = req.headers;
+    const id_token = req.headers['x-access-token'];
+    const headers = {
+        service_issuer,
+        id_token,
+        device_info,
+    };
+    if (handleValidation(req, res, headers, 'headers')) {
+        knex('user')
+            .where({
+                id_token
+            })
+            .select('idx')
+            .then((data) => {
+                if (!data.length) return Promise.reject('no idx');
+                const idx = data[0].idx;
+                const params = {
+                    Bucket: bucket.name,
+                };
+                s3.listObjects(params, (err, data) => {
+                    if (err) {
+                        console.log('err', err);
+                        return Promise.reject('getAllProfileImages ERR');
+                    }
+                    const bucketContents = data.Contents;
+                    const urls = [];
+                    bucketContents.forEach((content) => {
+                        if (content.Key.indexOf(`${idx}/profile`) !== -1) {
+                            urls.push({
+                                url: `https://s3.ap-northeast-2.amazonaws.com/${bucket.name}/${content.Key}`,
+                            });
+                        }
+                    });
+                    res.json({
+                        urls,
+                        logInfo: {
+                            device_info,
+                        },
+                    });
+                });
+
+            })
+            .catch(handleError);
+        //     s3.getSignedUrl('getObject', urlParams, (err, url) => {
+        //         if (err) console.log(err);
+        //         userUrls.push(url);
+        //     });
+        // }
     }
 };

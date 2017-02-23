@@ -21,10 +21,10 @@ userRouter.route('/me')
 userRouter.route('/me/state_message')
 .put(userController.updateStateMessage);
 
-userRouter.route('/me/image')
+//TODO: swagger.io 추가 요망
+userRouter.route('/me/image/:idx')
 .get(userS3.getAllProfileImages)
 .put(userS3.saveImage);
-
 
 userRouter.route('/:idx')
 .get(userController.getUserInfo);

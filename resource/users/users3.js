@@ -110,53 +110,56 @@ exports.saveImage = (req, res) => {
     }
 };
 
+/*================================================
+                 PROFILE IMAGE 가져오기
+================================================*/
+/*
+ * GET - 유저 프로필 사진 가져오기
+ */
 exports.getAllProfileImages = (req, res) => {
     const {
         service_issuer,
         device_info
     } = req.headers;
     const id_token = req.headers['x-access-token'];
+    const {
+        idx
+    } = req.params;
     const headers = {
         service_issuer,
         id_token,
         device_info,
     };
-    if (handleValidation(req, res, headers, 'headers')) {
-        knex('user')
-            .where({
-                id_token
-            })
-            .select('idx')
-            .then((data) => {
-                if (!data.length) return Promise.reject('no idx');
-                const idx = data[0].idx;
-                const params = {
-                    Bucket: bucket.name,
-                };
-                s3.listObjects(params, (err, data) => {
-                    if (err) {
-                        console.log('err', err);
-                        return Promise.reject('getAllProfileImages ERR');
-                    }
-                    const bucketContents = data.Contents;
-                    const urls = [];
-                    bucketContents.forEach((content) => {
-                        if (content.Key.indexOf(`${idx}/profile`) !== -1) {
-                            urls.unshift({
-                                url: `https://s3.ap-northeast-2.amazonaws.com/${bucket.name}/${content.Key}`,
-                            });
-                        }
-                    });
-                    res.json({
-                        urls,
-                        logInfo: {
-                            device_info,
-                        },
-                    });
-                });
+    const params = {
+        idx,
+    };
 
-            })
-            .catch(handleError);
+    if ((handleValidation(req, res, headers, 'headers')) &&
+        (handleValidation(req, res, headers, 'headers'))) {
+        const params = {
+            Bucket: bucket.name,
+        };
+        s3.listObjects(params, (err, data) => {
+            if (err) {
+                console.log('err', err);
+                return res.send('s3 listObjects ERR!');
+            }
+            const bucketContents = data.Contents;
+            const urls = [];
+            bucketContents.forEach((content) => {
+                if (content.Key.indexOf(`${idx}/profile`) !== -1) {
+                    urls.unshift({
+                        url: `https://s3.ap-northeast-2.amazonaws.com/${bucket.name}/${content.Key}`,
+                    });
+                }
+            });
+            res.json({
+                urls,
+                logInfo: {
+                    device_info,
+                },
+            });
+        });
         //     s3.getSignedUrl('getObject', urlParams, (err, url) => {
         //         if (err) console.log(err);
         //         userUrls.push(url);

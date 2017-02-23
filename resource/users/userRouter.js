@@ -1,6 +1,6 @@
 const userRouter = require('express').Router();
 const userController = require('./userController');
-
+const handleS3 = require('./handles3');
 /*===========================================
                 정렬 순서
                  * GET
@@ -21,6 +21,8 @@ userRouter.route('/me')
 userRouter.route('/me/state_message')
 .put(userController.updateStateMessage);
 
+userRouter.route('/me/image')
+.put(handleS3.saveImage);
 
 userRouter.route('/:idx')
 .get(userController.getUserInfo);

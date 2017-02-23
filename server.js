@@ -3,6 +3,8 @@ const expressValidator = require('express-validator');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const multer  = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 /*===========================================
                 LOAD the config
@@ -69,7 +71,6 @@ app.use('/flags', flagRouter);
 
 const friendRouter = require('./resource/friends/friendRouter');
 app.use('/friends', friendRouter);
-
 
 
 /*=========================================================

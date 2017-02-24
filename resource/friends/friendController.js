@@ -256,7 +256,6 @@ exports.handleFriendStatus = (req, res) => {
 };
 
 exports.deleteFriendStatus = (req, res) => {
-  console.log('headers bodysdfsdfsdfsdf', req.headers, req.body);
     const {
         service_issuer,
         device_info
@@ -277,15 +276,17 @@ exports.deleteFriendStatus = (req, res) => {
     if ((handleValidation(req, res, headers, 'headers')) &&
         (handleValidation(req, res, body, 'body'))) {
         const deleteFrinedStatus = (them) => {
-          console.log('sdjflsdfjlfjlsf', them);
             return knex('friend')
                 .where({
                     from: them.from,
                     to: them.to,
                 })
+                .orWhere({
+                  from: them.to,
+                  to: them.from,
+                })
                 .del()
                 .then((result) => {
-                  console.log('resulttttttttttttttttttt', result);
                     if (!result) return Promise.reject('deleteFrinedStatus ERR');
                     res.json({
                         logInfo: {

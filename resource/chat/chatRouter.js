@@ -1,6 +1,6 @@
-// const chatRouter = require('express').Router();
-// const chatController = require('./chatController');
-// const chatS3 = require('./chats3');
+const chatRouter = require('express').Router();
+const chatController = require('./chatController');
+const chatS3 = require('./chats3');
 // /*===========================================
 //                 정렬 순서
 //                  * GET

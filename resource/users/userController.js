@@ -297,17 +297,12 @@ exports.searchUser = (req, res) => {
  * GET - 유저 user_id 중복 확인
  */
 exports.checkDuplicatedUserId = (req, res) => {
-    const { service_issuer, device_info } = req.headers;
     const { user_id } = req.params;
-    const headers = {
-        service_issuer,
-        device_info,
-    };
     const params = {
         user_id,
     };
 
-    if (handleValidation(req, res, headers, 'headers') && handleValidation(req, res, params, 'params')) {
+    if (handleValidation(req, res, params, 'params')) {
         knex('user')
             .where({
                 user_id,

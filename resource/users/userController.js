@@ -314,7 +314,6 @@ exports.checkDuplicatedUserId = (req, res) => {
                     check,
                     logInfo: {
                         user_id,
-                        device_info,
                     },
                 });
             })

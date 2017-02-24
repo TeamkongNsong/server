@@ -8,8 +8,7 @@
 //                  * PUT
 //                  * DELETE
 // ===========================================*/
-//
-// chatRouter.route('/')
-// .post(chatController);
-//
-// module.exports = chatRouter;
+chatRouter.route('/')
+.post(chatController.sendMessage);
+
+module.exports = chatRouter;

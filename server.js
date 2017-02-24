@@ -72,8 +72,8 @@ app.use('/flags', flagRouter);
 const friendRouter = require('./resource/friends/friendRouter');
 app.use('/friends', friendRouter);
 
-// const chatRouter = require('./resource/chat/chatRouter');
-// app.use('/chats', chatRouter);
+const chatRouter = require('./resource/chat/chatRouter');
+app.use('/chats', chatRouter);
 
 
 /*=========================================================
